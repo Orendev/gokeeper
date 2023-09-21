@@ -19,3 +19,21 @@
 
 # Go workspace file
 go.work
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# IDEs directories
+.idea
+.vscode
+.env
+
+
+# Binaries
+cmd/client/main
+cmd/client/client 
+cmd/server/main
+cmd/server/server
+
+*.http
+*.db

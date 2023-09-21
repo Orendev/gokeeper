@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package keeper;
+
+option go_package = "pkg/protobuff";
+
+service keeperService {
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {};
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string password = 2;
+  string name = 3;
+  string surname = 4;
+  string patronymic = 5;
+}
+
+message CreateUserResponse{
+  string ID = 1;
+  string email = 2;
+  string name = 4;
+  string surname = 5;
+  string patronymic = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+  string jwt = 9;
+}
+
+message LoginUserRequest{
+  string email = 1;
+  string password = 2;
+}
+
+message LoginUserResponse { string access_token = 1; }
