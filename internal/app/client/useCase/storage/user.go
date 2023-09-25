@@ -8,14 +8,14 @@ import (
 	"github.com/Orendev/gokeeper/internal/app/client/domain/user"
 )
 
-// User Interface for interacting with the use case repository.
+// User Interface for interaction between delivery and use case
 type User interface {
-	AddUser(ctx context.Context, user user.User) (*user.User, error)
+	Add(ctx context.Context, user user.User) (*user.User, error)
 	UpdateToken(ctx context.Context, id uuid.UUID, token token.Token) (*user.User, error)
 	UserReader
 }
 
 // UserReader user-readable interface
 type UserReader interface {
-	GetUser(ctx context.Context) (*user.User, error)
+	Get(ctx context.Context) (*user.User, error)
 }

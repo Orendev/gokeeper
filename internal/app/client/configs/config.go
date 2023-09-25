@@ -9,16 +9,23 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-type GRPC struct {
-	Host string `env:"GRPC_HOST" env-default:"localhost"`
-	Port uint   `env:"GRPC_PORT" env-default:"3200"`
+type ServerGRPC struct {
+	Host       string `env:"GRPC_HOST" env-default:"localhost"`
+	Port       uint   `env:"GRPC_PORT" env-default:"3200"`
+	EnabledTLS bool   `env:"GRPC_ENABLED_TLS" env-default:"false"`
+
+	//UserConfig
 }
 
+//type UserConfig struct {
+//	AccessToken string `env:"USER_TOKEN"`
+//}
+
 type Config struct {
-	GRPC   GRPC
-	Log    logger.Options
-	Auth   auth.Options
-	SQLite sqlite.Options
+	ServerGRPC ServerGRPC
+	Log        logger.Options
+	Auth       auth.Options
+	SQLite     sqlite.Options
 }
 
 var configInstance *Config

@@ -4,7 +4,7 @@ import (
 	"github.com/Orendev/gokeeper/internal/app/server/domain/account"
 	"github.com/Orendev/gokeeper/internal/app/server/repository/storage/postgres/dao"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 
 	"context"
 	"errors"
@@ -14,7 +14,7 @@ import (
 	"github.com/Orendev/gokeeper/pkg/tools/transaction"
 	"github.com/Orendev/gokeeper/pkg/type/columnCode"
 	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
-	"github.com/georgysavva/scany/pgxscan"
+	"github.com/georgysavva/scany/v2/pgxscan"
 )
 
 var mappingSortAccount = map[columnCode.ColumnCode]string{

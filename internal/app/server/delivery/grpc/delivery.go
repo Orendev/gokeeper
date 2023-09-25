@@ -49,11 +49,16 @@ func New(
 
 	d.SetOptions(o)
 
-	interceptor := interceptors.NewAuthInterceptor(jwtManager, interceptors.AccessibleRoles())
+	interceptor := interceptors.NewAuthInterceptor(jwtManager, auth.AccessibleRoles())
+
+	var opts []grpc.ServerOption
+	opts = append(opts,
+		grpc.ChainUnaryInterceptor(interceptor.UnaryLogger()),
+		grpc.ChainUnaryInterceptor(interceptor.UnaryAuth()),
+	)
 
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(interceptor.UnaryLogger()),
-		grpc.UnaryInterceptor(interceptor.UnaryAuth()),
+		opts...,
 	)
 
 	protobuff.RegisterKeeperServiceServer(s, d)

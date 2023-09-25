@@ -1,10 +1,10 @@
 package user
 
 import (
+	"github.com/Orendev/gokeeper/pkg/type/name"
+	"github.com/Orendev/gokeeper/pkg/type/role"
 	"time"
 
-	"github.com/Orendev/gokeeper/internal/app/client/domain/user/name"
-	"github.com/Orendev/gokeeper/internal/app/client/domain/user/role"
 	"github.com/Orendev/gokeeper/pkg/type/email"
 	"github.com/Orendev/gokeeper/pkg/type/hashedPassword"
 	"github.com/Orendev/gokeeper/pkg/type/password"
@@ -32,6 +32,7 @@ func NewWithID(
 	email email.Email,
 	role role.Role,
 	name name.Name,
+	token token.Token,
 	createdAt time.Time,
 	updatedAt time.Time,
 ) (*User, error) {
@@ -46,6 +47,7 @@ func NewWithID(
 		email:     email,
 		name:      name,
 		role:      role,
+		token:     token,
 		createdAt: createdAt.UTC(),
 		updatedAt: updatedAt.UTC(),
 	}, nil
@@ -104,6 +106,17 @@ func (u User) CreatedAt() time.Time {
 // UpdatedAt getter for the field
 func (u User) UpdatedAt() time.Time {
 	return u.updatedAt
+}
+
+// Token getter for the field
+func (u User) Token() token.Token {
+	return u.token
+}
+
+func (u User) SetToken(token token.Token) *User {
+	u.token = token
+	u.updatedAt = time.Now().UTC()
+	return &u
 }
 
 // Equal compare two accounts

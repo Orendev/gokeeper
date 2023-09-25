@@ -8,8 +8,8 @@ import (
 	"github.com/Orendev/gokeeper/internal/app/server/repository/storage/postgres/dao"
 	"github.com/Orendev/gokeeper/pkg/tools/transaction"
 	"github.com/Orendev/gokeeper/pkg/type/email"
-	"github.com/georgysavva/scany/pgxscan"
-	"github.com/jackc/pgx/v4"
+	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 )
 

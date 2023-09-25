@@ -3,9 +3,8 @@ package sqlite
 import (
 	"context"
 	"database/sql"
-	"sync"
-
 	_ "github.com/mattn/go-sqlite3"
+	"sync"
 )
 
 type Store struct {
@@ -17,6 +16,7 @@ const File string = "./services/keeperClient/store.db"
 
 // Options basic settings postgres
 type Options struct {
+	Timeout        uint64 `env:"SQLITE_TIMEOUT"`
 	DaraSourceName string `env:"SQLITE_DATA_SOURCE_NAME" env-default:"./services/keeperClient/store.db"`
 	DefaultLimit   uint64 `env:"DEFAULT_LIMIT" env-default:"10"`
 	DefaultOffset  uint64 `env:"DEFAULT_OFFSET" env-default:"10"`

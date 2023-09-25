@@ -14,11 +14,12 @@ type User struct {
 	Password string `db:"password"`
 	Email    string `db:"email"`
 	Role     string `db:"role"`
+	Token    string `db:"token"`
 
 	Name string `db:"name"`
 }
 
-var CreateColumnUser = []string{
+var ColumnUser = []string{
 	"id",
 	"created_at",
 	"updated_at",
@@ -26,4 +27,5 @@ var CreateColumnUser = []string{
 	"email",
 	"role",
 	"name",
+	"token",
 }

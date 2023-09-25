@@ -2,23 +2,26 @@ package grpc
 
 import (
 	"context"
-
 	jsonUser "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/user"
 	domainUser "github.com/Orendev/gokeeper/internal/app/server/domain/user"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/name"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/patronymic"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/surname"
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
+	"github.com/Orendev/gokeeper/pkg/tools/converter"
 	"github.com/Orendev/gokeeper/pkg/type/email"
-	"github.com/Orendev/gokeeper/services/server/internal/domain/user/hashedPassword"
+	"github.com/Orendev/gokeeper/pkg/type/hashedPassword"
+	"github.com/Orendev/gokeeper/pkg/type/name"
+	"github.com/Orendev/gokeeper/pkg/type/password"
+	"github.com/Orendev/gokeeper/pkg/type/role"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"time"
 )
 
-// CreateUser creating a new user.
-func (d *Delivery) CreateUser(ctx context.Context, request *protobuff.CreateUserRequest) (*protobuff.CreateUserResponse, error) {
+// RegisterUser creating a new user.
+func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.RegisterUserRequest) (*protobuff.RegisterUserResponse, error) {
+
+	idUser := converter.StringToUUID(request.GetID())
 
 	nameUser, err := name.New(request.GetName())
 	if err != nil {
@@ -26,16 +29,10 @@ func (d *Delivery) CreateUser(ctx context.Context, request *protobuff.CreateUser
 		return nil, status.Errorf(codes.Internal, "user name validation error: %v", err)
 	}
 
-	surnameUser, err := surname.New(request.GetSurname())
+	roleUser, err := role.New(request.GetRole())
 	if err != nil {
 		logger.Log.Error("error create user", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "user surname validation error: %v", err)
-	}
-
-	patronymicUser, err := patronymic.New(request.GetPatronymic())
-	if err != nil {
-		logger.Log.Error("error create user", zap.Error(err))
-		return nil, status.Errorf(codes.Internal, "user patronymic validation error: %v", err)
+		return nil, status.Errorf(codes.Internal, "user role validation error: %v", err)
 	}
 
 	emailUser, err := email.New(request.GetEmail())
@@ -44,18 +41,27 @@ func (d *Delivery) CreateUser(ctx context.Context, request *protobuff.CreateUser
 		return nil, status.Errorf(codes.Internal, "user email validation error: %v", err)
 	}
 
-	hashedPassword, err := hashedPassword.New(request.GetPassword())
+	password, err := password.New(request.GetPassword())
 	if err != nil {
 		logger.Log.Error("error create user", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
 	}
 
-	dUser, err := domainUser.New(
-		*hashedPassword,
+	updatedAt := time.Now().UTC()
+
+	createdAt, err := time.Parse(time.DateTime, request.GetCreatedAt())
+	if err != nil {
+		return nil, err
+	}
+
+	dUser, err := domainUser.NewWithID(
+		idUser,
+		*password,
 		*emailUser,
 		*nameUser,
-		*surnameUser,
-		*patronymicUser,
+		*roleUser,
+		createdAt,
+		updatedAt,
 	)
 
 	if err != nil {
@@ -86,7 +92,12 @@ func (d *Delivery) LoginUser(ctx context.Context, request *protobuff.LoginUserRe
 		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
 
-	if user == nil || !user.IsCorrectPassword(request.GetPassword()) {
+	hashedPassword, err := hashedPassword.New(request.GetPassword())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
+	}
+
+	if user == nil || !user.IsCorrectPassword(*hashedPassword) {
 		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
 	}
 

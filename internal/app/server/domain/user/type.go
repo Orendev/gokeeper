@@ -1,12 +1,11 @@
 package user
 
 import (
+	"github.com/Orendev/gokeeper/pkg/type/name"
+	"github.com/Orendev/gokeeper/pkg/type/role"
+	"github.com/Orendev/gokeeper/pkg/type/token"
 	"time"
 
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/name"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/patronymic"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/role"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/surname"
 	"github.com/Orendev/gokeeper/pkg/type/email"
 	"github.com/Orendev/gokeeper/pkg/type/hashedPassword"
 	"github.com/Orendev/gokeeper/pkg/type/password"
@@ -15,15 +14,14 @@ import (
 )
 
 type User struct {
-	id         uuid.UUID
-	password   password.Password
-	email      email.Email
-	name       name.Name
-	surname    surname.Surname
-	patronymic patronymic.Patronymic
-	role       role.Role
-	createdAt  time.Time
-	updatedAt  time.Time
+	id        uuid.UUID
+	password  password.Password
+	email     email.Email
+	name      name.Name
+	role      role.Role
+	token     token.Token
+	createdAt time.Time
+	updatedAt time.Time
 }
 
 // NewWithID - constructor a new instance of User assets data with an ID.
@@ -32,8 +30,6 @@ func NewWithID(
 	password password.Password,
 	email email.Email,
 	name name.Name,
-	surname surname.Surname,
-	patronymic patronymic.Patronymic,
 	role role.Role,
 	createdAt time.Time,
 	updatedAt time.Time,
@@ -44,15 +40,13 @@ func NewWithID(
 	}
 
 	return &User{
-		id:         id,
-		password:   password,
-		email:      email,
-		name:       name,
-		surname:    surname,
-		patronymic: patronymic,
-		role:       role,
-		createdAt:  createdAt.UTC(),
-		updatedAt:  updatedAt.UTC(),
+		id:        id,
+		password:  password,
+		email:     email,
+		name:      name,
+		role:      role,
+		createdAt: createdAt.UTC(),
+		updatedAt: updatedAt.UTC(),
 	}, nil
 }
 
@@ -61,22 +55,20 @@ func New(
 	password password.Password,
 	email email.Email,
 	name name.Name,
-	surname surname.Surname,
-	patronymic patronymic.Patronymic,
+	token token.Token,
 ) (*User, error) {
 
 	var timeNow = time.Now().UTC()
 
 	return &User{
-		id:         uuid.New(),
-		password:   password,
-		email:      email,
-		name:       name,
-		surname:    surname,
-		patronymic: patronymic,
-		role:       role.User,
-		createdAt:  timeNow,
-		updatedAt:  timeNow,
+		id:        uuid.New(),
+		password:  password,
+		email:     email,
+		name:      name,
+		role:      role.User,
+		token:     token,
+		createdAt: timeNow,
+		updatedAt: timeNow,
 	}, nil
 }
 
@@ -100,14 +92,9 @@ func (u User) Name() name.Name {
 	return u.name
 }
 
-// Surname getter for the field
-func (u User) Surname() surname.Surname {
-	return u.surname
-}
-
-// Patronymic getter for the field
-func (u User) Patronymic() patronymic.Patronymic {
-	return u.patronymic
+// Token getter for the field
+func (u User) Token() token.Token {
+	return u.token
 }
 
 // Role getter for the field

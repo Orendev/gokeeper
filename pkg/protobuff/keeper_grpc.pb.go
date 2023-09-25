@@ -19,15 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	KeeperService_CreateUser_FullMethodName = "/keeper.keeperService/CreateUser"
-	KeeperService_LoginUser_FullMethodName  = "/keeper.keeperService/LoginUser"
+	KeeperService_RegisterUser_FullMethodName = "/keeper.keeperService/RegisterUser"
+	KeeperService_LoginUser_FullMethodName    = "/keeper.keeperService/LoginUser"
 )
 
 // KeeperServiceClient is the client API for KeeperService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KeeperServiceClient interface {
-	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
+	RegisterUser(ctx context.Context, in *RegisterUserRequest, opts ...grpc.CallOption) (*RegisterUserResponse, error)
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 }
 
@@ -39,9 +39,9 @@ func NewKeeperServiceClient(cc grpc.ClientConnInterface) KeeperServiceClient {
 	return &keeperServiceClient{cc}
 }
 
-func (c *keeperServiceClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
-	out := new(CreateUserResponse)
-	err := c.cc.Invoke(ctx, KeeperService_CreateUser_FullMethodName, in, out, opts...)
+func (c *keeperServiceClient) RegisterUser(ctx context.Context, in *RegisterUserRequest, opts ...grpc.CallOption) (*RegisterUserResponse, error) {
+	out := new(RegisterUserResponse)
+	err := c.cc.Invoke(ctx, KeeperService_RegisterUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *keeperServiceClient) LoginUser(ctx context.Context, in *LoginUserReques
 // All implementations must embed UnimplementedKeeperServiceServer
 // for forward compatibility
 type KeeperServiceServer interface {
-	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
+	RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error)
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
 	mustEmbedUnimplementedKeeperServiceServer()
 }
@@ -70,8 +70,8 @@ type KeeperServiceServer interface {
 type UnimplementedKeeperServiceServer struct {
 }
 
-func (UnimplementedKeeperServiceServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
+func (UnimplementedKeeperServiceServer) RegisterUser(context.Context, *RegisterUserRequest) (*RegisterUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
 }
 func (UnimplementedKeeperServiceServer) LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
@@ -89,20 +89,20 @@ func RegisterKeeperServiceServer(s grpc.ServiceRegistrar, srv KeeperServiceServe
 	s.RegisterService(&KeeperService_ServiceDesc, srv)
 }
 
-func _KeeperService_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateUserRequest)
+func _KeeperService_RegisterUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KeeperServiceServer).CreateUser(ctx, in)
+		return srv.(KeeperServiceServer).RegisterUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: KeeperService_CreateUser_FullMethodName,
+		FullMethod: KeeperService_RegisterUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).CreateUser(ctx, req.(*CreateUserRequest))
+		return srv.(KeeperServiceServer).RegisterUser(ctx, req.(*RegisterUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,8 +133,8 @@ var KeeperService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*KeeperServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateUser",
-			Handler:    _KeeperService_CreateUser_Handler,
+			MethodName: "RegisterUser",
+			Handler:    _KeeperService_RegisterUser_Handler,
 		},
 		{
 			MethodName: "LoginUser",

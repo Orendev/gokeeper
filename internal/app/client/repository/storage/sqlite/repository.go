@@ -6,9 +6,8 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/Orendev/gokeeper/pkg/store/sqlite"
-	"github.com/pressly/goose"
-
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/pressly/goose/v3"
 )
 
 type Repository struct {

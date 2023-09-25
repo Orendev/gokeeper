@@ -13,4 +13,4 @@ gen-cert:
 
 build-client: ## Build App Client
 	go mod tidy
-	go build -v -o $(APP_NAME)  -ldflags="-X 'github.com/Orendev/gokeeper/services/keeperClient/delivery/cli.version=0.0.2'" ./services/keeperClient/cmd/app/main.go
+	go build -v -o $(APP_NAME)  -ldflags="-X 'github.com/Orendev/gokeeper/internal/app/client/delivery/cli.version=0.0.2'" ./internal/app/client/cmd/client/main.go

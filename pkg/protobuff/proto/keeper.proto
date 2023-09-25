@@ -5,27 +5,27 @@ package keeper;
 option go_package = "pkg/protobuff";
 
 service keeperService {
-  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {}
+  rpc RegisterUser(RegisterUserRequest) returns (RegisterUserResponse) {}
   rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {};
 }
 
-message CreateUserRequest {
-  string email = 1;
-  string password = 2;
-  string name = 3;
-  string surname = 4;
-  string patronymic = 5;
-}
-
-message CreateUserResponse{
+message RegisterUserRequest {
   string ID = 1;
   string email = 2;
-  string name = 4;
-  string surname = 5;
-  string patronymic = 6;
-  string createdAt = 7;
-  string updatedAt = 8;
-  string jwt = 9;
+  string name = 3;
+  string password = 4;
+  string role = 5;
+  string createdAt = 6;
+}
+
+message RegisterUserResponse{
+  string ID = 1;
+  string email = 2;
+  string name = 3;
+  string role = 4;
+  string createdAt = 5;
+  string updatedAt = 6;
+  string access_token = 7;
 }
 
 message LoginUserRequest{
@@ -33,4 +33,11 @@ message LoginUserRequest{
   string password = 2;
 }
 
-message LoginUserResponse { string access_token = 1; }
+message LoginUserResponse{
+  string ID = 1;
+  string email = 2;
+  string name = 3;
+  string createdAt = 4;
+  string updatedAt = 5;
+  string access_token = 6;
+}

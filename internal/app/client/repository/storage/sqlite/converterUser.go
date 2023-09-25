@@ -2,12 +2,14 @@ package sqlite
 
 import (
 	"github.com/Orendev/gokeeper/internal/app/client/domain/user"
-	"github.com/Orendev/gokeeper/internal/app/client/domain/user/name"
-	"github.com/Orendev/gokeeper/internal/app/client/domain/user/role"
+	"github.com/Orendev/gokeeper/pkg/type/name"
+	"github.com/Orendev/gokeeper/pkg/type/role"
+	"github.com/Orendev/gokeeper/pkg/type/token"
+
 	"github.com/Orendev/gokeeper/internal/app/client/repository/storage/sqlite/dao"
 	"github.com/Orendev/gokeeper/pkg/type/email"
 	"github.com/Orendev/gokeeper/pkg/type/password"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r Repository) toCopyFromSourceUsers(users ...*user.User) pgx.CopyFromSource {
@@ -49,12 +51,18 @@ func (r Repository) toDomainUser(dao *dao.User) (*user.User, error) {
 		return nil, err
 	}
 
+	tokenObject, err := token.New(dao.Token)
+	if err != nil {
+		return nil, err
+	}
+
 	result, err := user.NewWithID(
 		dao.ID,
 		*passwordObject,
 		*emailObject,
 		*roleObject,
 		*nameObject,
+		*tokenObject,
 		dao.CreatedAt,
 		dao.UpdatedAt,
 	)

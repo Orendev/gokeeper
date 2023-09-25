@@ -8,14 +8,15 @@ type UseCase struct {
 	adapterStorage storage.User
 	options        Options
 }
-
-type Options struct{}
+type Options struct {
+}
 
 func New(storage storage.User, options Options) *UseCase {
 	var uc = &UseCase{
 		adapterStorage: storage,
 	}
 	uc.SetOptions(options)
+
 	return uc
 }
 

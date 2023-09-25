@@ -1,19 +1,23 @@
 package cli
 
 import (
-	"github.com/Orendev/gokeeper/internal/app/client/useCase"
+	"github.com/Orendev/gokeeper/internal/app/client/useCase/client"
+	"github.com/Orendev/gokeeper/internal/app/client/useCase/storage"
 	"github.com/spf13/cobra"
 )
 
 type Delivery struct {
-	ucUser  useCase.User
+	ucUserStorage storage.User
+	ucUserClient  client.User
+
 	rootCmd *cobra.Command
 }
 
 var version = "0.0.1"
 
 func New(
-	ucUser useCase.User,
+	ucUserStorage storage.User,
+	ucUserClient client.User,
 ) *Delivery {
 
 	rootCmd := &cobra.Command{
@@ -27,16 +31,22 @@ func New(
 	}
 
 	var d = &Delivery{
-		ucUser:  ucUser,
-		rootCmd: rootCmd,
+		ucUserStorage: ucUserStorage,
+		ucUserClient:  ucUserClient,
+		rootCmd:       rootCmd,
 	}
 
 	createUser := d.createUser()
-	findUser := d.findUser()
+	loginUser := d.loginUser()
+	getUser := d.getUser()
+
 	rootCmd.AddCommand(createUser)
 	initCreateUserArgs(createUser)
-	rootCmd.AddCommand(findUser)
-	initFindUserArgs(findUser)
+
+	rootCmd.AddCommand(loginUser)
+	initLoginUserArgs(loginUser)
+
+	rootCmd.AddCommand(getUser)
 
 	return d
 }

@@ -2,13 +2,16 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc"
+	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/interceptors"
+	useCaseUserClient "github.com/Orendev/gokeeper/internal/app/client/useCase/client/user"
+	useCaseUserStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/user"
+	"github.com/Orendev/gokeeper/pkg/tools/auth"
 	"log"
 
 	"github.com/Orendev/gokeeper/internal/app/client/configs"
 	deliveryCLI "github.com/Orendev/gokeeper/internal/app/client/delivery/cli"
 	repositorySQLite "github.com/Orendev/gokeeper/internal/app/client/repository/storage/sqlite"
-	useCaseUser "github.com/Orendev/gokeeper/internal/app/client/useCase/user"
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/store/sqlite"
 )
@@ -35,8 +38,8 @@ func main() {
 
 		}
 	}()
-	fmt.Println(cfg)
-	repoStorageSQLite, err := repositorySQLite.New(
+
+	repoSQLite, err := repositorySQLite.New(
 		conn.DB,
 		cfg.SQLite,
 	)
@@ -44,22 +47,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var (
-		ucUser      = useCaseUser.New(repoStorageSQLite, useCaseUser.Options{})
-		deliveryCLI = deliveryCLI.New(ucUser)
-	)
+	authInterceptor, err := interceptors.NewAuthInterceptor(
+		auth.AccessibleRoles(),
+		&cfg.ServerGRPC)
 
-	//go func() {
-	//	if err := deliveryCLI.Run(); err != nil {
-	//		log.Fatalf("failed to start client %s", err)
-	//	}
-	//}()
-
-	if err := deliveryCLI.Run(); err != nil {
-		log.Fatalf("failed to start client %s", err)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	//signalCh := make(chan os.Signal, 1)
-	//signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
-	//<-signalCh
+	repoClient, err := grpc.New(authInterceptor, cfg.ServerGRPC)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var (
+		ucUserStorage = useCaseUserStorage.New(repoSQLite, useCaseUserStorage.Options{})
+		ucUserClient  = useCaseUserClient.New(repoClient, useCaseUserClient.Options{})
+		cli           = deliveryCLI.New(ucUserStorage, ucUserClient)
+	)
+
+	if err := cli.Run(); err != nil {
+		log.Fatalf("failed to start client %s", err)
+	}
 }

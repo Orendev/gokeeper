@@ -9,7 +9,7 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/Orendev/gokeeper/pkg/type/title"
 	"github.com/Orendev/gokeeper/pkg/type/version"
-	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r Repository) toCopyFromSourceAccounts(accounts ...*account.Account) pgx.CopyFromSource {

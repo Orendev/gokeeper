@@ -2,13 +2,12 @@ package postgres
 
 import (
 	"github.com/Orendev/gokeeper/internal/app/server/domain/user"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/name"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/patronymic"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/user/surname"
 	"github.com/Orendev/gokeeper/internal/app/server/repository/storage/postgres/dao"
 	"github.com/Orendev/gokeeper/pkg/type/email"
+	"github.com/Orendev/gokeeper/pkg/type/name"
 	"github.com/Orendev/gokeeper/pkg/type/password"
-	"github.com/jackc/pgx/v4"
+	"github.com/Orendev/gokeeper/pkg/type/role"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r Repository) toCopyFromSourceUsers(users ...*user.User) pgx.CopyFromSource {
@@ -20,8 +19,8 @@ func (r Repository) toCopyFromSourceUsers(users ...*user.User) pgx.CopyFromSourc
 			val.Password().String(),
 			val.Email().String(),
 			val.Name().String(),
-			val.Surname().String(),
-			val.Patronymic().String(),
+			val.Token().String(),
+			val.Role().String(),
 			val.CreatedAt(),
 			val.UpdatedAt(),
 		}
@@ -47,12 +46,7 @@ func (r Repository) toDomainUser(dao *dao.User) (*user.User, error) {
 		return nil, err
 	}
 
-	surnametObject, err := surname.New(dao.Surname)
-	if err != nil {
-		return nil, err
-	}
-
-	patronymicObject, err := patronymic.New(dao.Patronymic)
+	roleObject, err := role.New(dao.Role)
 	if err != nil {
 		return nil, err
 	}
@@ -62,8 +56,7 @@ func (r Repository) toDomainUser(dao *dao.User) (*user.User, error) {
 		*passwordObject,
 		*emailObject,
 		*nameObject,
-		*surnametObject,
-		*patronymicObject,
+		*roleObject,
 		dao.CreatedAt,
 		dao.UpdatedAt,
 	)

@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS "user"
     role       varchar(50) NOT NULL,
     password   varchar(50) NOT NULL,
     name       varchar(50) NOT NULL,
+    token      varcher(255),
     CONSTRAINT users_email_unique UNIQUE (email)
 
 );

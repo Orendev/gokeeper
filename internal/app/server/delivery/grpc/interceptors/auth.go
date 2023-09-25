@@ -2,7 +2,6 @@ package interceptors
 
 import (
 	"context"
-
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
 	"go.uber.org/zap"
@@ -12,8 +11,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-const servicePath = "/gophkeeper.proto.Keeper/"
-
 type AuthInterceptor struct {
 	jwtManager      *auth.JWTManager
 	accessibleRoles map[string][]string
@@ -21,14 +18,6 @@ type AuthInterceptor struct {
 
 func NewAuthInterceptor(jwtManager *auth.JWTManager, accessibleRoles map[string][]string) *AuthInterceptor {
 	return &AuthInterceptor{jwtManager, accessibleRoles}
-}
-
-func AccessibleRoles() map[string][]string {
-
-	return map[string][]string{
-		servicePath + "CreateAccount": {"admin", "user"},
-		servicePath + "UpdateAccount": {"user"},
-	}
 }
 
 func (interceptor *AuthInterceptor) UnaryAuth() grpc.UnaryServerInterceptor {
@@ -43,6 +32,7 @@ func (interceptor *AuthInterceptor) UnaryAuth() grpc.UnaryServerInterceptor {
 		)
 
 		err := interceptor.authorize(ctx, info.FullMethod)
+
 		if err != nil {
 			return nil, err
 		}
