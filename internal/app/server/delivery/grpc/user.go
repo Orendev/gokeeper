@@ -47,9 +47,9 @@ func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.Register
 		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
 	}
 
-	updatedAt := time.Now().UTC()
+	createdAt := time.Now().UTC()
+	updatedAt := createdAt
 
-	createdAt, err := time.Parse(time.DateTime, request.GetCreatedAt())
 	if err != nil {
 		return nil, err
 	}

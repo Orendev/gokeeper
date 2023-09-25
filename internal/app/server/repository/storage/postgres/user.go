@@ -2,7 +2,6 @@ package postgres
 
 import (
 	"context"
-
 	"github.com/Masterminds/squirrel"
 	"github.com/Orendev/gokeeper/internal/app/server/domain/user"
 	"github.com/Orendev/gokeeper/internal/app/server/repository/storage/postgres/dao"
@@ -39,7 +38,7 @@ func (r Repository) createUserTx(ctx context.Context, tx pgx.Tx, users ...*user.
 
 	_, err := tx.CopyFrom(
 		ctx,
-		pgx.Identifier{"keeper", "user"},
+		pgx.Identifier{"users"},
 		dao.CreateColumnUser,
 		r.toCopyFromSourceUsers(users...))
 	if err != nil {
@@ -72,7 +71,7 @@ func (r Repository) loginUserTx(ctx context.Context, tx pgx.Tx, email email.Emai
 		"name",
 		"surname",
 		"patronymic",
-	).From("keeper.user")
+	).From("users")
 
 	builder = builder.Where(squirrel.Eq{"email": email.String()})
 

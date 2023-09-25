@@ -19,8 +19,8 @@ func (r Repository) toCopyFromSourceUsers(users ...*user.User) pgx.CopyFromSourc
 			val.Password().String(),
 			val.Email().String(),
 			val.Name().String(),
-			val.Token().String(),
 			val.Role().String(),
+			val.Token().String(),
 			val.CreatedAt(),
 			val.UpdatedAt(),
 		}

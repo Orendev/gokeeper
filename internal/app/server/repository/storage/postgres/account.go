@@ -49,7 +49,7 @@ func (r *Repository) createAccountTx(ctx context.Context, tx pgx.Tx, accounts ..
 
 	_, err := tx.CopyFrom(
 		ctx,
-		pgx.Identifier{"keeper", "account"},
+		pgx.Identifier{"accounts"},
 		dao.CreateColumnAccount,
 		r.toCopyFromSourceAccounts(accounts...))
 	if err != nil {
@@ -85,7 +85,7 @@ func (r *Repository) UpdateAccount(ID uuid.UUID, updateFn func(c *account.Accoun
 
 func (r *Repository) updateAccountTx(ctx context.Context, tx pgx.Tx, in *account.Account) (*account.Account, error) {
 
-	builder := r.genSQL.Update("keeper.account").
+	builder := r.genSQL.Update("accounts").
 		Set("user_id", in.UserID()).
 		Set("title", in.Title().String()).
 		Set("login", in.Login().String()).
@@ -151,7 +151,7 @@ func (r *Repository) DeleteAccount(ID uuid.UUID) error {
 }
 
 func (r *Repository) deleteAccountTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) error {
-	builder := r.genSQL.Update("keeper.account").
+	builder := r.genSQL.Update("accounts").
 		Set("is_deleted", true).
 		Set("updated_at", time.Now().UTC()).
 		Where(squirrel.Eq{"is_deleted": false, "id": ID})
@@ -210,7 +210,7 @@ func (r *Repository) listAccountTx(ctx context.Context, tx pgx.Tx, parameter que
 		"comment",
 		"web_address",
 		"version",
-	).From("keeper.account")
+	).From("accounts")
 
 	builder = builder.Where(squirrel.Eq{"is_deleted": false})
 
@@ -277,7 +277,7 @@ func (r *Repository) oneAccountTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) 
 		"comment",
 		"web_address",
 		"version",
-	).From("keeper.account")
+	).From("accounts")
 
 	builder = builder.Where(squirrel.Eq{"is_deleted": false, "id": ID})
 
@@ -306,7 +306,7 @@ func (r *Repository) oneAccountTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) 
 func (r *Repository) CountAccount() (uint64, error) {
 	var builder = r.genSQL.Select(
 		"COUNT(id)",
-	).From("keeper.account")
+	).From("accounts")
 
 	builder = builder.Where(squirrel.Eq{"is_deleted": false})
 
