@@ -3,10 +3,6 @@ package sqlite
 import (
 	"context"
 	"database/sql"
-	"github.com/Orendev/gokeeper/pkg/type/token"
-	"github.com/google/uuid"
-	"time"
-
 	"github.com/Masterminds/squirrel"
 	"github.com/Orendev/gokeeper/internal/app/client/domain/user"
 	"github.com/Orendev/gokeeper/internal/app/client/repository/storage/sqlite/dao"
@@ -14,7 +10,10 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/email"
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/georgysavva/scany/v2/sqlscan"
+	"github.com/google/uuid"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
+	"time"
 )
 
 func (r *Repository) AddUser(ctx context.Context, user user.User) (*user.User, error) {
@@ -159,7 +158,7 @@ func (r *Repository) getUserTx(ctx context.Context, tx *sql.Tx) (*user.User, err
 	return r.toDomainUser(daoUser[0])
 }
 
-func (r *Repository) UpdateToken(ctx context.Context, id uuid.UUID, token token.Token) (*user.User, error) {
+func (r *Repository) UpdateToken(ctx context.Context, id uuid.UUID, updateFn func(u *user.User) (*user.User, error)) (*user.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(r.options.Timeout)*time.Second)
 	defer cancel()
 
@@ -172,28 +171,52 @@ func (r *Repository) UpdateToken(ctx context.Context, id uuid.UUID, token token.
 		err = transaction.FinishSQL(ctx, t, err)
 	}(ctx, tx)
 
-	return r.updateTokenTx(ctx, tx, id, token)
+	upContact, err := r.oneUserTx(ctx, tx, id)
+	if err != nil {
+		return nil, err
+	}
+	in, err := updateFn(upContact)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.updateTokenTx(ctx, tx, in)
 }
 
-func (r *Repository) updateTokenTx(ctx context.Context, tx *sql.Tx, id uuid.UUID, token token.Token) (*user.User, error) {
+func (r *Repository) updateTokenTx(ctx context.Context, tx *sql.Tx, in *user.User) (*user.User, error) {
+	builder := r.genSQL.
+		Update("user").
+		Set("token", in.Token().String()).
+		Where(squirrel.Eq{
+			"id": in.ID().String(),
+		})
 
-	builder := r.genSQL.Update("user").
-		Set("token", token).
-		Where(squirrel.And{
-			squirrel.Eq{
-				"id": id,
-			},
-		}).
-		Suffix(`RETURNING
-			id,
-			created_at,
-			updated_at,
-			password,
-			email,
-			role,
-			name,
-			token`,
-		)
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = tx.ExecContext(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return in, nil
+}
+
+func (r *Repository) oneUserTx(ctx context.Context, tx *sql.Tx, ID uuid.UUID) (*user.User, error) {
+	var builder = r.genSQL.Select(
+		"id",
+		"created_at",
+		"updated_at",
+		"password",
+		"email",
+		"role",
+		"name",
+		"token",
+	).From("user")
+
+	builder = builder.Where(squirrel.Eq{"id": ID})
 
 	query, args, err := builder.ToSql()
 	if err != nil {
@@ -205,10 +228,14 @@ func (r *Repository) updateTokenTx(ctx context.Context, tx *sql.Tx, id uuid.UUID
 		return nil, err
 	}
 
-	var daoUser *dao.User
-	if err = sqlscan.ScanOne(&daoUser, rows); err != nil {
+	var daoUser []*dao.User
+	if err = sqlscan.ScanAll(&daoUser, rows); err != nil {
 		return nil, err
 	}
 
-	return r.toDomainUser(daoUser)
+	if len(daoUser) == 0 {
+		return nil, err
+	}
+
+	return r.toDomainUser(daoUser[0])
 }

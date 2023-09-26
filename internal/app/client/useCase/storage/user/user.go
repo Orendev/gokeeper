@@ -2,10 +2,8 @@ package user
 
 import (
 	"context"
-	"github.com/Orendev/gokeeper/pkg/type/token"
-	"github.com/google/uuid"
-
 	"github.com/Orendev/gokeeper/internal/app/client/domain/user"
+	"time"
 )
 
 // Add creating a user
@@ -14,8 +12,10 @@ func (uc *UseCase) Add(ctx context.Context, user user.User) (*user.User, error) 
 }
 
 // UpdateToken update token a user
-func (uc *UseCase) UpdateToken(ctx context.Context, id uuid.UUID, token token.Token) (*user.User, error) {
-	return uc.adapterStorage.UpdateToken(ctx, id, token)
+func (uc *UseCase) UpdateToken(ctx context.Context, update user.User) (*user.User, error) {
+	return uc.adapterStorage.UpdateToken(ctx, update.ID(), func(old *user.User) (*user.User, error) {
+		return user.NewWithID(old.ID(), update.Password(), update.Email(), update.Role(), update.Name(), update.Token(), old.CreatedAt(), time.Now().UTC())
+	})
 }
 
 // Get let's get the user

@@ -36,7 +36,8 @@ message LoginUserResponse{
   string ID = 1;
   string email = 2;
   string name = 3;
-  string createdAt = 4;
-  string updatedAt = 5;
-  string access_token = 6;
+  string role = 4;
+  string createdAt = 5;
+  string updatedAt = 6;
+  string access_token = 7;
 }

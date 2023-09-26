@@ -31,7 +31,7 @@ func (r *Repository) CreateUser(users ...*user.User) ([]*user.User, error) {
 	return response, nil
 }
 
-func (r Repository) createUserTx(ctx context.Context, tx pgx.Tx, users ...*user.User) ([]*user.User, error) {
+func (r *Repository) createUserTx(ctx context.Context, tx pgx.Tx, users ...*user.User) ([]*user.User, error) {
 	if len(users) == 0 {
 		return []*user.User{}, nil
 	}
@@ -62,7 +62,7 @@ func (r *Repository) FindUser(email email.Email) (*user.User, error) {
 	return r.loginUserTx(ctx, tx, email)
 }
 
-func (r Repository) loginUserTx(ctx context.Context, tx pgx.Tx, email email.Email) (*user.User, error) {
+func (r *Repository) loginUserTx(ctx context.Context, tx pgx.Tx, email email.Email) (*user.User, error) {
 	var builder = r.genSQL.Select(
 		"id",
 		"created_at",

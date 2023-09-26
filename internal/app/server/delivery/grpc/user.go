@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	jsonUser "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/user"
+	converterUser "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/user"
 	domainUser "github.com/Orendev/gokeeper/internal/app/server/domain/user"
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
@@ -12,6 +12,7 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/name"
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/Orendev/gokeeper/pkg/type/role"
+	"github.com/Orendev/gokeeper/pkg/type/token"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -41,7 +42,13 @@ func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.Register
 		return nil, status.Errorf(codes.Internal, "user email validation error: %v", err)
 	}
 
-	password, err := password.New(request.GetPassword())
+	hashPasswordUser, err := hashedPassword.New(request.GetPassword())
+	if err != nil {
+		logger.Log.Error("error create user", zap.Error(err))
+		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
+	}
+
+	passwordUser, err := password.New(hashPasswordUser.String())
 	if err != nil {
 		logger.Log.Error("error create user", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
@@ -56,7 +63,7 @@ func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.Register
 
 	dUser, err := domainUser.NewWithID(
 		idUser,
-		*password,
+		*passwordUser,
 		*emailUser,
 		*nameUser,
 		*roleUser,
@@ -69,43 +76,60 @@ func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.Register
 		return nil, status.Errorf(codes.Internal, "user initialization error: %v", err)
 	}
 
+	tok, err := d.jwtManager.Generate(dUser.ID())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot generate access token")
+	}
+
+	tokenObject, err := token.New(tok)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot generate access token")
+	}
+
+	dUser.SetToken(*tokenObject)
+
 	response, err := d.ucUser.Create(dUser)
 	if err != nil {
 		logger.Log.Error("error login", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user creation error: %v", err)
 	}
 
-	res := jsonUser.ToUserResponse(response[0])
-	return res, nil
+	return converterUser.ToRegisterUserResponse(response[0]), nil
 }
 
 // LoginUser user authorization.
 func (d *Delivery) LoginUser(ctx context.Context, request *protobuff.LoginUserRequest) (*protobuff.LoginUserResponse, error) {
-	emailUser, err := email.New(request.GetEmail())
+	emailUserObject, err := email.New(request.GetEmail())
 	if err != nil {
 		logger.Log.Error("error login", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user email validation error: %v", err)
 	}
 
-	user, err := d.ucUser.Find(*emailUser)
+	user, err := d.ucUser.Find(*emailUserObject)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
 
-	hashedPassword, err := hashedPassword.New(request.GetPassword())
+	hashedPasswordObject, err := hashedPassword.New(request.GetPassword())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
 	}
 
-	if user == nil || !user.IsCorrectPassword(*hashedPassword) {
+	if user == nil || !user.IsCorrectPassword(*hashedPasswordObject) {
 		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
 	}
 
-	token, err := d.jwtManager.Generate(user.ID())
+	tok, err := d.jwtManager.Generate(user.ID())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot generate access token")
 	}
 
-	res := &protobuff.LoginUserResponse{AccessToken: token}
-	return res, nil
+	tokenObject, err := token.New(tok)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot generate access token")
+	}
+
+	user.SetToken(*tokenObject)
+
+	return converterUser.ToLoginUserResponse(user), nil
 }

@@ -7,9 +7,9 @@ CREATE TABLE IF NOT EXISTS "user"
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     email      varchar(255) NOT NULL,
     role       varchar(50) NOT NULL,
-    password   varchar(50) NOT NULL,
+    password   varchar NOT NULL,
     name       varchar(50) NOT NULL,
-    token      varcher(255),
+    token      varchar,
     CONSTRAINT users_email_unique UNIQUE (email)
 
 );

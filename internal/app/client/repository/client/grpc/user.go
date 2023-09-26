@@ -36,6 +36,7 @@ func (c *Client) LoginUser(ctx context.Context, email email.Email, password pass
 func (c *Client) RegisterUser(ctx context.Context, user user.User) (*user.User, error) {
 
 	req := &protobuff.RegisterUserRequest{
+		ID:       user.ID().String(),
 		Email:    user.Email().String(),
 		Password: user.Password().String(),
 		Name:     user.Name().String(),

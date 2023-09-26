@@ -73,51 +73,57 @@ func New(
 }
 
 // ID getter for the field
-func (u User) ID() uuid.UUID {
+func (u *User) ID() uuid.UUID {
 	return u.id
 }
 
 // Password getter for the field
-func (u User) Password() password.Password {
+func (u *User) Password() password.Password {
 	return u.password
 }
 
 // Email getter for the field
-func (u User) Email() email.Email {
+func (u *User) Email() email.Email {
 	return u.email
 }
 
 // Name getter for the field
-func (u User) Name() name.Name {
+func (u *User) Name() name.Name {
 	return u.name
 }
 
 // Token getter for the field
-func (u User) Token() token.Token {
+func (u *User) Token() token.Token {
 	return u.token
 }
 
 // Role getter for the field
-func (u User) Role() role.Role {
+func (u *User) Role() role.Role {
 	return u.role
 }
 
 // CreatedAt getter for the field
-func (u User) CreatedAt() time.Time {
+func (u *User) CreatedAt() time.Time {
 	return u.createdAt
 }
 
 // UpdatedAt getter for the field
-func (u User) UpdatedAt() time.Time {
+func (u *User) UpdatedAt() time.Time {
 	return u.updatedAt
 }
 
+func (u *User) SetToken(token token.Token) *User {
+	u.token = token
+	u.updatedAt = time.Now().UTC()
+	return u
+}
+
 // Equal compare two accounts
-func (u User) Equal(user User) bool {
+func (u *User) Equal(user User) bool {
 	return u.id == user.id
 }
 
-func (u User) IsCorrectPassword(hashedPassword hashedPassword.HashedPassword) bool {
+func (u *User) IsCorrectPassword(hashedPassword hashedPassword.HashedPassword) bool {
 	err := bcrypt.CompareHashAndPassword(hashedPassword.Byte(), u.password.Byte())
 	return err == nil
 }

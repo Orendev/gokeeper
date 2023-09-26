@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-
 	"github.com/Orendev/gokeeper/internal/app/client/delivery/cli/user"
 	domainUser "github.com/Orendev/gokeeper/internal/app/client/domain/user"
 	"github.com/Orendev/gokeeper/pkg/logger"
@@ -25,7 +24,7 @@ func (d *Delivery) createUser() *cobra.Command {
 		Short:   "Register new user in the service.",
 		Long:    `This command register a new user: Keeper client registerUser --name=<name> --email=<dev@email.com> --password=<password>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
+			ctx := context.Background()
 			nameUser, err := name.New(userArgs.Name)
 			if err != nil {
 				logger.Log.Error("name input fields", zap.Error(err))
@@ -50,14 +49,23 @@ func (d *Delivery) createUser() *cobra.Command {
 				*nameUser,
 			)
 
-			us, err := d.ucUserStorage.Add(context.Background(), *dUser)
+			us, err := d.ucUserStorage.Add(ctx, *dUser)
 			if err != nil {
 				logger.Log.Info("create user", zap.Error(err))
 				return
 			}
-			_, err = d.ucUserClient.Register(context.Background(), *us)
+
+			userRegister, err := d.ucUserClient.Register(ctx, *us)
 			if err != nil {
 				logger.Log.Info("register user", zap.Error(err))
+				return
+			}
+
+			dUser.SetToken(userRegister.Token())
+
+			_, err = d.ucUserStorage.UpdateToken(ctx, *dUser)
+			if err != nil {
+				logger.Log.Info("update token user", zap.Error(err))
 				return
 			}
 		},

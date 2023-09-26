@@ -5,22 +5,12 @@ import (
 	"strings"
 
 	"github.com/Orendev/gokeeper/pkg/type/password"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
-)
-
-var (
-	MaxLength          = 50
-	ErrPasswordTooLong = errors.Errorf("password length exceeds %d characters", MaxLength)
 )
 
 type HashedPassword string
 
 func New(password string) (*HashedPassword, error) {
-
-	if len([]rune(password)) > MaxLength {
-		return nil, ErrPasswordTooLong
-	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
