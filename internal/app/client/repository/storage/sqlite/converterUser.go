@@ -51,7 +51,7 @@ func (r Repository) toDomainUser(dao *dao.User) (*user.User, error) {
 		return nil, err
 	}
 
-	tokenObject, err := token.New(dao.Token)
+	tokenObject, err := token.New(dao.Token.String)
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +69,7 @@ func (r Repository) toDomainUser(dao *dao.User) (*user.User, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 

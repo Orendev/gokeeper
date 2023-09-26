@@ -111,11 +111,12 @@ func (d *Delivery) getUser() *cobra.Command {
 				return
 			}
 
-			msg := fmt.Sprintf("ID: %s\nName: %s\nEmail: %s\nRole: %s\nPassword: %s\nCreatedAt: %s\nUpdatedAt: %s\n",
+			msg := fmt.Sprintf("ID: %s\nName: %s\nEmail: %s\nRole: %s\nToken: %s\nPassword: %s\nCreatedAt: %s\nUpdatedAt: %s\n",
 				userFind.ID().String(),
 				userFind.Name().String(),
 				userFind.Email().String(),
 				userFind.Role().String(),
+				userFind.Token().String(),
 				userFind.Password().String(),
 				userFind.CreatedAt().String(),
 				userFind.UpdatedAt().String(),
