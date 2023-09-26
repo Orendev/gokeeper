@@ -50,12 +50,12 @@ func (d *Delivery) createUser() *cobra.Command {
 				*nameUser,
 			)
 
-			user, err := d.ucUserStorage.Add(context.Background(), *dUser)
+			us, err := d.ucUserStorage.Add(context.Background(), *dUser)
 			if err != nil {
 				logger.Log.Info("create user", zap.Error(err))
 				return
 			}
-			_, err = d.ucUserClient.Register(context.Background(), *user)
+			_, err = d.ucUserClient.Register(context.Background(), *us)
 			if err != nil {
 				logger.Log.Info("register user", zap.Error(err))
 				return
