@@ -50,8 +50,9 @@ func (interceptor *AuthInterceptor) UnaryAuth() grpc.UnaryClientInterceptor {
 		opts ...grpc.CallOption,
 	) error {
 
-		logger.Log.Info("--> ",
+		logger.Log.Info("<-- ",
 			zap.Any("unary interceptor: ", method),
+			zap.Any("reg", req),
 		)
 
 		_, ok := interceptor.accessibleRoles[method]

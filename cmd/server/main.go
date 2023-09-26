@@ -2,12 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
-	"os"
-	"os/signal"
-	"syscall"
-
+	"github.com/Orendev/gokeeper/internal/app/server"
 	"github.com/Orendev/gokeeper/internal/app/server/configs"
 	deliveryGrpc "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc"
 	repositoryStorage "github.com/Orendev/gokeeper/internal/app/server/repository/storage/postgres"
@@ -19,9 +14,11 @@ import (
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/store/postgres"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
+	"log"
 )
 
 func main() {
+
 	cfg, err := configs.New()
 	if err != nil {
 		log.Fatal(err)
@@ -53,16 +50,6 @@ func main() {
 		deliveryGRPC = deliveryGrpc.New(ucUser, ucAccount, ucCard, ucText, ucBinary, jwtManager, cfg.Delivery.GRPC)
 	)
 
-	go func() {
-		fmt.Printf("service started successfully on grpc port: %d", cfg.Delivery.GRPC.Port)
-		// получаем запрос gRPC
+	server.Run(deliveryGRPC, cfg)
 
-		if err := deliveryGRPC.Run(); err != nil {
-			log.Fatalf("failed to start grpc server %s", err)
-		}
-	}()
-
-	signalCh := make(chan os.Signal, 1)
-	signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
-	<-signalCh
 }

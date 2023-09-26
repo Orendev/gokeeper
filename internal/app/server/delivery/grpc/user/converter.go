@@ -3,6 +3,7 @@ package user
 import (
 	domainUser "github.com/Orendev/gokeeper/internal/app/server/domain/user"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
+	"time"
 )
 
 func ToUserResponse(response *domainUser.User) *protobuff.RegisterUserResponse {
@@ -12,7 +13,7 @@ func ToUserResponse(response *domainUser.User) *protobuff.RegisterUserResponse {
 		Name:        response.Name().String(),
 		Role:        response.Role().String(),
 		AccessToken: response.Token().String(),
-		CreatedAt:   response.CreatedAt().String(),
-		UpdatedAt:   response.UpdatedAt().String(),
+		CreatedAt:   response.CreatedAt().Format(time.RFC3339),
+		UpdatedAt:   response.UpdatedAt().Format(time.RFC3339),
 	}
 }

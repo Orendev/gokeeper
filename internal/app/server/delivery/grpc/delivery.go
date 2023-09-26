@@ -83,7 +83,6 @@ func (d *Delivery) Run() error {
 }
 
 // ShutDown graceful stops the server.
-func (d *Delivery) ShutDown() error {
+func (d *Delivery) ShutDown() {
 	d.serv.GracefulStop()
-	return nil
 }

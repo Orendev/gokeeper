@@ -40,12 +40,12 @@ func toDomainUser(dto dto.User) (*user.User, error) {
 		return nil, err
 	}
 
-	createdAt, err := time.Parse(time.DateTime, dto.CreatedAt)
+	createdAt, err := time.Parse(time.RFC3339, dto.CreatedAt)
 	if err != nil {
 		return nil, err
 	}
 
-	updatedAt, err := time.Parse(time.DateTime, dto.UpdatedAt)
+	updatedAt, err := time.Parse(time.RFC3339, dto.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
