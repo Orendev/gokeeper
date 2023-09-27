@@ -11,9 +11,9 @@ func (uc *UseCase) Add(ctx context.Context, user user.User) (*user.User, error) 
 	return uc.adapterStorage.AddUser(ctx, user)
 }
 
-// UpdateToken update token a user
-func (uc *UseCase) UpdateToken(ctx context.Context, update user.User) (*user.User, error) {
-	return uc.adapterStorage.UpdateToken(ctx, update.ID(), func(old *user.User) (*user.User, error) {
+// UpdateUser update token a user
+func (uc *UseCase) UpdateUser(ctx context.Context, update user.User) (*user.User, error) {
+	return uc.adapterStorage.UpdateUser(ctx, update.ID(), func(old *user.User) (*user.User, error) {
 		return user.NewWithID(old.ID(), update.Password(), update.Email(), update.Role(), update.Name(), update.Token(), old.CreatedAt(), time.Now().UTC())
 	})
 }

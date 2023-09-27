@@ -11,12 +11,13 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
+	"time"
 )
 
 var userArgs user.RegisterUserArgs
 var loginUserArgs user.LoginUserArgs
 
-func (d *Delivery) createUser() *cobra.Command {
+func (d *Delivery) registerUser() *cobra.Command {
 
 	return &cobra.Command{
 		Use:     "registerUser",
@@ -55,15 +56,15 @@ func (d *Delivery) createUser() *cobra.Command {
 				return
 			}
 
-			userRegister, err := d.ucUserClient.Register(ctx, *us)
+			userExternal, err := d.ucUserClient.Register(ctx, *us)
 			if err != nil {
 				logger.Log.Info("register user", zap.Error(err))
 				return
 			}
 
-			dUser.SetToken(userRegister.Token())
+			dUser.SetToken(userExternal.Token())
 
-			_, err = d.ucUserStorage.UpdateToken(ctx, *dUser)
+			_, err = d.ucUserStorage.UpdateUser(ctx, *dUser)
 			if err != nil {
 				logger.Log.Info("update token user", zap.Error(err))
 				return
@@ -80,6 +81,7 @@ func (d *Delivery) loginUser() *cobra.Command {
 		Short:   "Login user in the service.",
 		Long:    `This command login a user: Keeper client loginUser --email=<dev@email.com> --password=<password>.`,
 		Run: func(cmd *cobra.Command, args []string) {
+			ctx := context.Background()
 
 			emailUser, err := email.New(loginUserArgs.Email)
 			if err != nil {
@@ -93,12 +95,58 @@ func (d *Delivery) loginUser() *cobra.Command {
 				return
 			}
 
-			//_, err = d.ucUserStorage.Login(context.Background(), *emailUser, *passwordUser)
-			_, err = d.ucUserClient.Login(context.Background(), *emailUser, *passwordUser)
+			userExternal, err := d.ucUserClient.Login(ctx, *emailUser, *passwordUser)
 			if err != nil {
-				logger.Log.Info("create user", zap.Error(err))
+				logger.Log.Info("user authorization", zap.Error(err))
 				return
 			}
+
+			var dUser *domainUser.User
+
+			userInternal, err := d.ucUserStorage.Get(ctx)
+			if err != nil {
+				fmt.Printf("User locally: %s\n", err.Error())
+
+				dUser, err = domainUser.NewWithID(
+					userExternal.ID(),
+					*passwordUser,
+					*emailUser,
+					userExternal.Role(),
+					userExternal.Name(),
+					userExternal.Token(),
+					userExternal.CreatedAt(),
+					time.Now().UTC(),
+				)
+				if err != nil {
+					fmt.Printf("Error create User locally: %s\n", err.Error())
+					return
+				}
+
+				_, err := d.ucUserStorage.Add(ctx, *dUser)
+				if err != nil {
+					fmt.Printf("Error create User locally: %s\n", err.Error())
+					return
+				}
+
+			} else {
+				dUser, err = domainUser.NewWithID(
+					userInternal.ID(),
+					*passwordUser,
+					*emailUser,
+					userInternal.Role(),
+					userInternal.Name(),
+					userExternal.Token(),
+					userInternal.CreatedAt(),
+					time.Now().UTC(),
+				)
+
+				_, err = d.ucUserStorage.UpdateUser(ctx, *dUser)
+				if err != nil {
+					fmt.Printf("Error update token user: %s\n", err.Error())
+					return
+				}
+			}
+
 		},
 	}
 }
@@ -135,7 +183,7 @@ func (d *Delivery) getUser() *cobra.Command {
 	}
 }
 
-func initCreateUserArgs(cmd *cobra.Command) {
+func initRegisterUserArgs(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&userArgs.Name, "name", "n", "", "user name value.")
 	cmd.Flags().StringVarP(&userArgs.Email, "email", "e", "", "user email value.")
 	cmd.Flags().StringVarP(&userArgs.Password, "password", "p", "", "user password value.")

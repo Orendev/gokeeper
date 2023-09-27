@@ -7,8 +7,6 @@ import (
 	"github.com/Orendev/gokeeper/internal/app/client/domain/user"
 	"github.com/Orendev/gokeeper/internal/app/client/repository/storage/sqlite/dao"
 	"github.com/Orendev/gokeeper/pkg/tools/transaction"
-	"github.com/Orendev/gokeeper/pkg/type/email"
-	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/georgysavva/scany/v2/sqlscan"
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
@@ -16,6 +14,7 @@ import (
 	"time"
 )
 
+// AddUser create a user
 func (r *Repository) AddUser(ctx context.Context, user user.User) (*user.User, error) {
 
 	tx, err := r.db.Begin()
@@ -58,57 +57,7 @@ func (r *Repository) addUserTx(ctx context.Context, tx *sql.Tx, user user.User) 
 	return &user, nil
 }
 
-func (r *Repository) FindUser(ctx context.Context, email email.Email) (*user.User, error) {
-	tx, err := r.db.Begin()
-	if err != nil {
-		return nil, err
-	}
-
-	defer func(ctx context.Context, t *sql.Tx) {
-		err = transaction.FinishSQL(ctx, t, err)
-	}(ctx, tx)
-
-	return r.findUserTx(ctx, tx, email)
-}
-
-func (r Repository) findUserTx(ctx context.Context, tx *sql.Tx, email email.Email) (*user.User, error) {
-	var builder = r.genSQL.Select(
-		"id",
-		"created_at",
-		"updated_at",
-		"email",
-		"role",
-		"name",
-	).From("user")
-
-	builder = builder.Where(squirrel.Eq{"email": email.String()})
-
-	query, args, err := builder.ToSql()
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := tx.QueryContext(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	var daoUser []*dao.User
-	if err = sqlscan.ScanAll(&daoUser, rows); err != nil {
-		return nil, err
-	}
-
-	if len(daoUser) == 0 {
-		return nil, errors.New("user not found")
-	}
-
-	return r.toDomainUser(daoUser[0])
-}
-
-func (r *Repository) LoginUser(ctx context.Context, email email.Email, password password.Password) (*user.User, error) {
-	panic("implement me")
-}
-
+// GetUser receive a user
 func (r *Repository) GetUser(ctx context.Context) (*user.User, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -158,7 +107,8 @@ func (r *Repository) getUserTx(ctx context.Context, tx *sql.Tx) (*user.User, err
 	return r.toDomainUser(daoUser[0])
 }
 
-func (r *Repository) UpdateToken(ctx context.Context, id uuid.UUID, updateFn func(u *user.User) (*user.User, error)) (*user.User, error) {
+// UpdateUser update user token
+func (r *Repository) UpdateUser(ctx context.Context, id uuid.UUID, updateFn func(u *user.User) (*user.User, error)) (*user.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Duration(r.options.Timeout)*time.Second)
 	defer cancel()
 
@@ -180,12 +130,17 @@ func (r *Repository) UpdateToken(ctx context.Context, id uuid.UUID, updateFn fun
 		return nil, err
 	}
 
-	return r.updateTokenTx(ctx, tx, in)
+	return r.updateUserTx(ctx, tx, in)
 }
 
-func (r *Repository) updateTokenTx(ctx context.Context, tx *sql.Tx, in *user.User) (*user.User, error) {
+func (r *Repository) updateUserTx(ctx context.Context, tx *sql.Tx, in *user.User) (*user.User, error) {
+
 	builder := r.genSQL.
 		Update("user").
+		Set("password", in.Password().String()).
+		Set("email", in.Email().String()).
+		Set("role", in.Role().String()).
+		Set("Name", in.Name().String()).
 		Set("token", in.Token().String()).
 		Where(squirrel.Eq{
 			"id": in.ID().String(),

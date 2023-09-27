@@ -36,12 +36,12 @@ func New(
 		rootCmd:       rootCmd,
 	}
 
-	createUser := d.createUser()
+	registerUser := d.registerUser()
 	loginUser := d.loginUser()
 	getUser := d.getUser()
 
-	rootCmd.AddCommand(createUser)
-	initCreateUserArgs(createUser)
+	rootCmd.AddCommand(registerUser)
+	initRegisterUserArgs(registerUser)
 
 	rootCmd.AddCommand(loginUser)
 	initLoginUserArgs(loginUser)

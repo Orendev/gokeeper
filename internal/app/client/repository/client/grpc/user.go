@@ -32,7 +32,7 @@ func (c *Client) LoginUser(ctx context.Context, email email.Email, password pass
 	return toDomainUser(*data)
 }
 
-// RegisterUser login user and returns the User
+// RegisterUser user registration
 func (c *Client) RegisterUser(ctx context.Context, user user.User) (*user.User, error) {
 
 	req := &protobuff.RegisterUserRequest{
@@ -59,6 +59,6 @@ func (c *Client) RegisterUser(ctx context.Context, user user.User) (*user.User, 
 }
 
 // SetToken install a token User
-func (c Client) SetToken(ctx context.Context, token token.Token) bool {
+func (c *Client) SetToken(ctx context.Context, token token.Token) bool {
 	return c.authInterceptor.SetToken(token.String())
 }
