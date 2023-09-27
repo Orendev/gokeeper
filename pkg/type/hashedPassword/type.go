@@ -16,8 +16,8 @@ func New(password string) (*HashedPassword, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot hash password: %w", err)
 	}
-
-	p := HashedPassword(hashedPassword)
+	encryptedPassword := string(hashedPassword)
+	p := HashedPassword(encryptedPassword)
 
 	return &p, nil
 }

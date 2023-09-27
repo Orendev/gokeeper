@@ -190,8 +190,8 @@ func initRegisterUserArgs(cmd *cobra.Command) {
 }
 
 func initLoginUserArgs(cmd *cobra.Command) {
-	cmd.Flags().StringVarP(&userArgs.Email, "email", "e", "", "user email value.")
-	cmd.Flags().StringVarP(&userArgs.Password, "password", "p", "", "user password value.")
+	cmd.Flags().StringVarP(&loginUserArgs.Email, "email", "e", "", "user email value.")
+	cmd.Flags().StringVarP(&loginUserArgs.Password, "password", "p", "", "user password value.")
 	err := cmd.MarkFlagRequired("email")
 	if err != nil {
 		return

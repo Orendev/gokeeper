@@ -110,13 +110,13 @@ func (d *Delivery) LoginUser(ctx context.Context, request *protobuff.LoginUserRe
 		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
 	}
 
-	hashedPasswordObject, err := hashedPassword.New(request.GetPassword())
+	passwordObject, err := password.New(request.GetPassword())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
 	}
 
-	if user == nil || !user.IsCorrectPassword(*hashedPasswordObject) {
-		return nil, status.Errorf(codes.NotFound, "incorrect username/password")
+	if user == nil || !user.IsCorrectPassword(*passwordObject) {
+		return nil, status.Errorf(codes.NotFound, "incorrect email/password")
 	}
 
 	tok, err := d.jwtManager.Generate(user.ID())

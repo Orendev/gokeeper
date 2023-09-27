@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Orendev/gokeeper/pkg/type/email"
-	"github.com/Orendev/gokeeper/pkg/type/hashedPassword"
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -123,7 +122,7 @@ func (u *User) Equal(user User) bool {
 	return u.id == user.id
 }
 
-func (u *User) IsCorrectPassword(hashedPassword hashedPassword.HashedPassword) bool {
-	err := bcrypt.CompareHashAndPassword(hashedPassword.Byte(), u.password.Byte())
+func (u *User) IsCorrectPassword(password password.Password) bool {
+	err := bcrypt.CompareHashAndPassword(u.password.Byte(), password.Byte())
 	return err == nil
 }

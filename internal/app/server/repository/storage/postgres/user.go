@@ -59,18 +59,19 @@ func (r *Repository) FindUser(email email.Email) (*user.User, error) {
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
 
-	return r.loginUserTx(ctx, tx, email)
+	return r.findUserTx(ctx, tx, email)
 }
 
-func (r *Repository) loginUserTx(ctx context.Context, tx pgx.Tx, email email.Email) (*user.User, error) {
+func (r *Repository) findUserTx(ctx context.Context, tx pgx.Tx, email email.Email) (*user.User, error) {
 	var builder = r.genSQL.Select(
 		"id",
 		"created_at",
 		"updated_at",
 		"email",
+		"password",
 		"name",
-		"surname",
-		"patronymic",
+		"role",
+		"token",
 	).From("users")
 
 	builder = builder.Where(squirrel.Eq{"email": email.String()})
