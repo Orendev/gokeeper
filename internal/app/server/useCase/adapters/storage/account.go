@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"context"
 	"github.com/Orendev/gokeeper/internal/app/server/domain/account"
 	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
 	"github.com/google/uuid"
@@ -10,14 +11,13 @@ import (
 
 type Account interface {
 	CreateAccount(accounts ...*account.Account) ([]*account.Account, error)
-	UpdateAccount(ID uuid.UUID, updateFn func(a *account.Account) (*account.Account, error)) (*account.Account, error)
-	DeleteAccount(ID uuid.UUID) error
+	UpdateAccount(ctx context.Context, id uuid.UUID, updateFn func(a *account.Account) (*account.Account, error)) (*account.Account, error)
+	DeleteAccount(id uuid.UUID) error
 
 	AccountReader
 }
 
 type AccountReader interface {
 	ListAccount(parameter queryParameter.QueryParameter) ([]*account.Account, error)
-	ReadAccountByID(ID uuid.UUID) (response *account.Account, err error)
-	CountAccount( /*Тут можно передавать фильтр*/ ) (uint64, error)
+	GetByIDAccount(id uuid.UUID) (response *account.Account, err error)
 }

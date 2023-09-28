@@ -8,7 +8,7 @@ import (
 // User Interface for interaction between delivery and use case
 type User interface {
 	Add(ctx context.Context, user user.User) (*user.User, error)
-	UpdateUser(ctx context.Context, update user.User) (*user.User, error)
+	Update(ctx context.Context, update user.User) (*user.User, error)
 	UserReader
 }
 

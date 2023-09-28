@@ -16,11 +16,9 @@ type Account struct {
 	Login    string `db:"login"`
 	Password string `db:"password"`
 
-	Title      string `db:"title"`
-	Comment    string `db:"comment"`
-	WebAddress string `db:"web_address"`
-
-	Version uint64 `db:"version"`
+	Title   string `db:"title"`
+	Comment string `db:"comment"`
+	URL     string `db:"url"`
 }
 
 var CreateColumnAccount = []string{
@@ -32,6 +30,5 @@ var CreateColumnAccount = []string{
 	"password",
 	"title",
 	"comment",
-	"web_address",
-	"version",
+	"url",
 }

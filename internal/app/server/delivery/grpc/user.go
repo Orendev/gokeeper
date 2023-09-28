@@ -57,10 +57,6 @@ func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.Register
 	createdAt := time.Now().UTC()
 	updatedAt := createdAt
 
-	if err != nil {
-		return nil, err
-	}
-
 	dUser, err := domainUser.NewWithID(
 		idUser,
 		*passwordUser,

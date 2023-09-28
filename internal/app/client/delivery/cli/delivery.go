@@ -10,6 +10,9 @@ type Delivery struct {
 	ucUserStorage storage.User
 	ucUserClient  client.User
 
+	ucAccountStorage storage.Account
+	ucAccountClient  client.Account
+
 	rootCmd *cobra.Command
 }
 
@@ -47,6 +50,10 @@ func New(
 	initLoginUserArgs(loginUser)
 
 	rootCmd.AddCommand(getUser)
+
+	createAccount := d.createAccount()
+	rootCmd.AddCommand(createAccount)
+	initCreateAccountArgs(createAccount)
 
 	return d
 }

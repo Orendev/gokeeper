@@ -59,8 +59,8 @@ func (r *Repository) createAccountTx(ctx context.Context, tx pgx.Tx, accounts ..
 	return accounts, nil
 }
 
-func (r *Repository) UpdateAccount(ID uuid.UUID, updateFn func(c *account.Account) (*account.Account, error)) (*account.Account, error) {
-	var ctx = context.Background()
+// UpdateAccount update account
+func (r *Repository) UpdateAccount(ctx context.Context, id uuid.UUID, updateFn func(c *account.Account) (*account.Account, error)) (*account.Account, error) {
 
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
@@ -71,10 +71,11 @@ func (r *Repository) UpdateAccount(ID uuid.UUID, updateFn func(c *account.Accoun
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
 
-	upAccount, err := r.oneAccountTx(ctx, tx, ID)
+	upAccount, err := r.oneAccountTx(ctx, tx, id)
 	if err != nil {
 		return nil, err
 	}
+
 	in, err := updateFn(upAccount)
 	if err != nil {
 		return nil, err
@@ -92,8 +93,7 @@ func (r *Repository) updateAccountTx(ctx context.Context, tx pgx.Tx, in *account
 		Set("password", in.Password().String()).
 		Set("updated_at", in.UpdatedAt()).
 		Set("comment", in.Comment().String()).
-		Set("web_address", in.WebAddress().String()).
-		Set("version", in.Version()).
+		Set("url", in.URL().String()).
 		Where(squirrel.And{
 			squirrel.Eq{
 				"id":         in.ID(),
@@ -109,8 +109,7 @@ func (r *Repository) updateAccountTx(ctx context.Context, tx pgx.Tx, in *account
 			login,
 			password,
 			comment,
-			web_address,
-			version`,
+			url`,
 		)
 
 	query, args, err := builder.ToSql()
@@ -208,8 +207,7 @@ func (r *Repository) listAccountTx(ctx context.Context, tx pgx.Tx, parameter que
 		"login",
 		"password",
 		"comment",
-		"web_address",
-		"version",
+		"url",
 	).From("accounts")
 
 	builder = builder.Where(squirrel.Eq{"is_deleted": false})
@@ -245,7 +243,7 @@ func (r *Repository) listAccountTx(ctx context.Context, tx pgx.Tx, parameter que
 	return r.toDomainAccounts(daoAccounts)
 }
 
-func (r *Repository) ReadAccountByID(ID uuid.UUID) (response *account.Account, err error) {
+func (r *Repository) GetByIDAccount(ID uuid.UUID) (response *account.Account, err error) {
 	var ctx = context.Background()
 
 	tx, err := r.db.Begin(ctx)
@@ -275,8 +273,7 @@ func (r *Repository) oneAccountTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) 
 		"login",
 		"password",
 		"comment",
-		"web_address",
-		"version",
+		"url",
 	).From("accounts")
 
 	builder = builder.Where(squirrel.Eq{"is_deleted": false, "id": ID})

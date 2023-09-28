@@ -4,4 +4,5 @@ package storage
 
 type Storage struct {
 	User
+	Account
 }

@@ -64,7 +64,7 @@ func (d *Delivery) registerUser() *cobra.Command {
 
 			dUser.SetToken(userExternal.Token())
 
-			_, err = d.ucUserStorage.UpdateUser(ctx, *dUser)
+			_, err = d.ucUserStorage.Update(ctx, *dUser)
 			if err != nil {
 				logger.Log.Info("update token user", zap.Error(err))
 				return
@@ -140,7 +140,7 @@ func (d *Delivery) loginUser() *cobra.Command {
 					time.Now().UTC(),
 				)
 
-				_, err = d.ucUserStorage.UpdateUser(ctx, *dUser)
+				_, err = d.ucUserStorage.Update(ctx, *dUser)
 				if err != nil {
 					fmt.Printf("Error update token user: %s\n", err.Error())
 					return

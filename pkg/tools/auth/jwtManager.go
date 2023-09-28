@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"context"
 	"fmt"
+	"google.golang.org/grpc/metadata"
 	"time"
 
 	"errors"
@@ -15,6 +17,8 @@ const (
 )
 
 var (
+	// ErrorTokenContextMissing токен не был передан.
+	ErrorTokenContextMissing = errors.New("token up for parsing was not passed through the context")
 
 	// ErrTokenInvalid означает, что токен не удалось проверить.
 	ErrTokenInvalid = errors.New("JWT was invalid")
@@ -84,4 +88,26 @@ func (manager *JWTManager) Verify(accessToken string) (*Claims, error) {
 	}
 
 	return claims, nil
+}
+
+// GetAuthIdentifier get the uuid of the jwt token header Authorization user.
+func (manager *JWTManager) GetAuthIdentifier(ctx context.Context) (uuid.UUID, error) {
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return uuid.Nil, ErrorTokenContextMissing
+	}
+
+	values := md[AuthorizationKey]
+	if len(values) == 0 {
+		return uuid.Nil, ErrTokenInvalid
+	}
+
+	accessToken := values[0]
+	claims, err := manager.Verify(accessToken)
+	if err != nil {
+		return uuid.Nil, ErrTokenInvalid
+	}
+
+	return claims.UserID, nil
 }

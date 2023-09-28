@@ -1,28 +1,23 @@
 package account
 
 import (
-	"github.com/Orendev/gokeeper/pkg/type/url"
-	"time"
-
 	"github.com/Orendev/gokeeper/pkg/type/comment"
 	"github.com/Orendev/gokeeper/pkg/type/login"
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/Orendev/gokeeper/pkg/type/title"
+	"github.com/Orendev/gokeeper/pkg/type/url"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"time"
 )
-
-// Description of types
 
 var (
 	ErrLoginRequired    = errors.New("login is required")
 	ErrPasswordRequired = errors.New("password is required")
-	ErrUserIDRequired   = errors.New("userID is required")
 )
 
 type Account struct {
 	id        uuid.UUID
-	userID    uuid.UUID
 	title     title.Title
 	login     login.Login
 	password  password.Password
@@ -36,12 +31,12 @@ type Account struct {
 // NewWithID - constructor a new instance of Account assets data with an ID.
 func NewWithID(
 	id uuid.UUID,
-	userID uuid.UUID,
 	title title.Title,
 	login login.Login,
 	password password.Password,
 	url url.URL,
 	comment comment.Comment,
+	isDeleted bool,
 	createdAt time.Time,
 	updatedAt time.Time,
 ) (*Account, error) {
@@ -58,18 +53,14 @@ func NewWithID(
 		return nil, ErrPasswordRequired
 	}
 
-	if userID == uuid.Nil {
-		return nil, ErrUserIDRequired
-	}
-
 	return &Account{
 		id:        id,
-		userID:    userID,
 		title:     title,
 		login:     login,
 		password:  password,
 		url:       url,
 		comment:   comment,
+		isDeleted: isDeleted,
 		createdAt: createdAt.UTC(),
 		updatedAt: updatedAt.UTC(),
 	}, nil
@@ -77,7 +68,6 @@ func NewWithID(
 
 // New - constructor a new instance of Account.
 func New(
-	userID uuid.UUID,
 	title title.Title,
 	login login.Login,
 	password password.Password,
@@ -93,20 +83,16 @@ func New(
 		return nil, ErrPasswordRequired
 	}
 
-	if userID == uuid.Nil {
-		return nil, ErrUserIDRequired
-	}
-
 	var timeNow = time.Now().UTC()
 
 	return &Account{
 		id:        uuid.New(),
-		userID:    userID,
 		title:     title,
 		login:     login,
 		password:  password,
 		url:       url,
 		comment:   comment,
+		isDeleted: false,
 		createdAt: timeNow,
 		updatedAt: timeNow,
 	}, nil
@@ -115,11 +101,6 @@ func New(
 // ID getter for the field
 func (a *Account) ID() uuid.UUID {
 	return a.id
-}
-
-// UserID getter for the field
-func (a *Account) UserID() uuid.UUID {
-	return a.userID
 }
 
 // Title getter for the field
@@ -160,9 +141,4 @@ func (a *Account) UpdatedAt() time.Time {
 // IsDeleted getter for the field
 func (a *Account) IsDeleted() bool {
 	return a.isDeleted
-}
-
-// Equal compare two accounts
-func (a *Account) Equal(account Account) bool {
-	return a.id == account.id
 }
