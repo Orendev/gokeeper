@@ -1,10 +1,11 @@
 package grpc
 
 import (
+	"time"
+
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/dto"
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/Orendev/gokeeper/pkg/type/token"
-	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/client/domain/user"
 	"github.com/Orendev/gokeeper/pkg/type/email"

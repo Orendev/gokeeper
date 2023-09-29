@@ -1,6 +1,8 @@
 package account
 
 import (
+	"time"
+
 	"github.com/Orendev/gokeeper/pkg/type/comment"
 	"github.com/Orendev/gokeeper/pkg/type/login"
 	"github.com/Orendev/gokeeper/pkg/type/password"
@@ -8,7 +10,6 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/url"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"time"
 )
 
 var (

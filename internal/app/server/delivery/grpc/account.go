@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"time"
+
 	converterAccount "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/account"
 	"github.com/Orendev/gokeeper/internal/app/server/domain/account"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
@@ -13,7 +15,6 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/url"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"time"
 )
 
 func (d *Delivery) CreateAccount(ctx context.Context, req *protobuff.CreateAccountRequest) (*protobuff.CreateAccountResponse, error) {

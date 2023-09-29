@@ -3,8 +3,9 @@ package sqlite
 import (
 	"context"
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
 	"sync"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Store struct {

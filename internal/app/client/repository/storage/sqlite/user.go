@@ -3,6 +3,8 @@ package sqlite
 import (
 	"context"
 	"database/sql"
+	"time"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/Orendev/gokeeper/internal/app/client/domain/user"
 	"github.com/Orendev/gokeeper/internal/app/client/repository/storage/sqlite/dao"
@@ -11,7 +13,6 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/pkg/errors"
-	"time"
 )
 
 // AddUser create a user

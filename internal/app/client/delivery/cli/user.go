@@ -3,6 +3,8 @@ package cli
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/Orendev/gokeeper/internal/app/client/delivery/cli/user"
 	domainUser "github.com/Orendev/gokeeper/internal/app/client/domain/user"
 	"github.com/Orendev/gokeeper/pkg/logger"
@@ -11,7 +13,6 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
-	"time"
 )
 
 var userArgs user.RegisterUserArgs

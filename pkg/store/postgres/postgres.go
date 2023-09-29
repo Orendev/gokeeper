@@ -3,9 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/Orendev/gokeeper/internal/app/server/configs"
 	"strings"
 	"time"
+
+	"github.com/Orendev/gokeeper/internal/app/server/configs"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"

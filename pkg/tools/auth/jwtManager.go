@@ -3,8 +3,9 @@ package auth
 import (
 	"context"
 	"fmt"
-	"google.golang.org/grpc/metadata"
 	"time"
+
+	"google.golang.org/grpc/metadata"
 
 	"errors"
 

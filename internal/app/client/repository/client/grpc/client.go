@@ -4,12 +4,13 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+
 	"github.com/Orendev/gokeeper/internal/app/client/configs"
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/interceptors"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"io/ioutil"
 )
 
 type Client struct {

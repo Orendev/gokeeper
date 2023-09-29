@@ -3,13 +3,14 @@ package server
 import (
 	"context"
 	"fmt"
-	"github.com/Orendev/gokeeper/internal/app/server/configs"
-	deliveryGrpc "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc"
 	"log"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/Orendev/gokeeper/internal/app/server/configs"
+	deliveryGrpc "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc"
 )
 
 func Run(delivery *deliveryGrpc.Delivery, cfg *configs.Config) {

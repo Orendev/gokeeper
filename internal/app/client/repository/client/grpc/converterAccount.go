@@ -1,6 +1,8 @@
 package grpc
 
 import (
+	"time"
+
 	"github.com/Orendev/gokeeper/internal/app/client/domain/account"
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/dto"
 	"github.com/Orendev/gokeeper/pkg/type/comment"
@@ -8,7 +10,6 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/Orendev/gokeeper/pkg/type/title"
 	"github.com/Orendev/gokeeper/pkg/type/url"
-	"time"
 
 	"github.com/google/uuid"
 )

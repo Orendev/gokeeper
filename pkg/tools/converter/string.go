@@ -4,14 +4,16 @@ import (
 	"github.com/google/uuid"
 )
 
+// StringToUUID convert string to uuid
 func StringToUUID(str string) uuid.UUID {
 	if len(str) == 0 {
 		return uuid.Nil
-	} else {
-		if value, err := uuid.Parse(str); err != nil {
-			return uuid.Nil
-		} else {
-			return value
-		}
 	}
+
+	value, err := uuid.Parse(str)
+	if err != nil {
+		return uuid.Nil
+	}
+
+	return value
 }

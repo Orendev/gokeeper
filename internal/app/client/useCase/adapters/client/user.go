@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+
 	"github.com/Orendev/gokeeper/internal/app/client/domain/user"
 	"github.com/Orendev/gokeeper/pkg/type/email"
 	"github.com/Orendev/gokeeper/pkg/type/password"

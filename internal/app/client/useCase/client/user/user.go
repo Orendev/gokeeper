@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+
 	"github.com/Orendev/gokeeper/pkg/type/email"
 	"github.com/Orendev/gokeeper/pkg/type/password"
 

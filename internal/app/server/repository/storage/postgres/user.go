@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/Orendev/gokeeper/internal/app/server/domain/user"
 	"github.com/Orendev/gokeeper/internal/app/server/repository/storage/postgres/dao"

@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"fmt"
+
 	"github.com/Masterminds/squirrel"
 	"github.com/Orendev/gokeeper/internal/app/server/configs"
 	"github.com/jackc/pgx/v5/pgxpool"

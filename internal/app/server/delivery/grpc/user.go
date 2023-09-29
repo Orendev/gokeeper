@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"time"
+
 	converterUser "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/user"
 	domainUser "github.com/Orendev/gokeeper/internal/app/server/domain/user"
 	"github.com/Orendev/gokeeper/pkg/logger"
@@ -16,7 +18,6 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"time"
 )
 
 // RegisterUser creating a new user.

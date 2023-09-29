@@ -1,9 +1,10 @@
 package user
 
 import (
+	"time"
+
 	"github.com/Orendev/gokeeper/pkg/type/name"
 	"github.com/Orendev/gokeeper/pkg/type/role"
-	"time"
 
 	"github.com/Orendev/gokeeper/pkg/type/email"
 	"github.com/Orendev/gokeeper/pkg/type/hashedPassword"

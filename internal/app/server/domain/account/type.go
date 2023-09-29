@@ -1,8 +1,9 @@
 package account
 
 import (
-	"github.com/Orendev/gokeeper/pkg/type/url"
 	"time"
+
+	"github.com/Orendev/gokeeper/pkg/type/url"
 
 	"github.com/Orendev/gokeeper/pkg/type/comment"
 	"github.com/Orendev/gokeeper/pkg/type/login"

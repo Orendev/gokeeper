@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+
 	"github.com/Orendev/gokeeper/internal/app/client/delivery/cli/account"
 	domainAccount "github.com/Orendev/gokeeper/internal/app/client/domain/account"
 	"github.com/Orendev/gokeeper/pkg/type/comment"

@@ -1,9 +1,10 @@
 package user
 
 import (
+	"time"
+
 	domainUser "github.com/Orendev/gokeeper/internal/app/server/domain/user"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
-	"time"
 )
 
 func ToRegisterUserResponse(response *domainUser.User) *protobuff.RegisterUserResponse {

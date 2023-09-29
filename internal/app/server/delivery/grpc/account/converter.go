@@ -1,9 +1,10 @@
 package account
 
 import (
+	"time"
+
 	domainAccount "github.com/Orendev/gokeeper/internal/app/server/domain/account"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
-	"time"
 )
 
 func ToCreateAccountResponse(account *domainAccount.Account) *protobuff.CreateAccountResponse {
