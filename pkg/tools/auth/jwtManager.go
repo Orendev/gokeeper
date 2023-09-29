@@ -28,8 +28,6 @@ var (
 	ErrUnexpectedSigningMethod = errors.New("unexpected signing method")
 )
 
-const TokenExp = time.Hour * 3
-
 type Options struct {
 	CryptoKeyJWT     string        `env:"CRYPTO_KEY_JWT" env-default:"supersecretkey"`
 	TokenDurationJWT time.Duration `env:"TOKEN_DURATION_JWT"`

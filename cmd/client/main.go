@@ -1,7 +1,8 @@
 package main
 
 import (
-	"context"
+	"log"
+
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc"
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/interceptors"
 	useCaseAccountClient "github.com/Orendev/gokeeper/internal/app/client/useCase/client/account"
@@ -9,7 +10,6 @@ import (
 	useCaseAccountStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/account"
 	useCaseUserStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/user"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
-	"log"
 
 	"github.com/Orendev/gokeeper/internal/app/client/configs"
 	deliveryCLI "github.com/Orendev/gokeeper/internal/app/client/delivery/cli"
@@ -28,7 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	conn, err := sqlite.New(context.Background(), cfg.SQLite)
+	conn, err := sqlite.New(cfg.SQLite)
 
 	if err != nil {
 		panic(err)
