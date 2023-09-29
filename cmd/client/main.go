@@ -4,7 +4,9 @@ import (
 	"context"
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc"
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/interceptors"
+	useCaseAccountClient "github.com/Orendev/gokeeper/internal/app/client/useCase/client/account"
 	useCaseUserClient "github.com/Orendev/gokeeper/internal/app/client/useCase/client/user"
+	useCaseAccountStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/account"
 	useCaseUserStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/user"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
 	"log"
@@ -64,7 +66,11 @@ func main() {
 	var (
 		ucUserStorage = useCaseUserStorage.New(repoSQLite, useCaseUserStorage.Options{})
 		ucUserClient  = useCaseUserClient.New(repoClient, useCaseUserClient.Options{})
-		cli           = deliveryCLI.New(ucUserStorage, ucUserClient)
+
+		ucAccountStorage = useCaseAccountStorage.New(repoSQLite, useCaseAccountStorage.Options{})
+		ucAccountClient  = useCaseAccountClient.New(repoClient, useCaseAccountClient.Options{})
+
+		cli = deliveryCLI.New(ucUserStorage, ucUserClient, ucAccountStorage, ucAccountClient)
 	)
 
 	if err := cli.Run(); err != nil {

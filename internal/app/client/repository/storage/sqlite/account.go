@@ -34,13 +34,22 @@ func (r *Repository) CreateAccount(ctx context.Context, account account.Account)
 	return res, nil
 }
 
-func (r *Repository) createAccountTx(ctx context.Context, tx *sql.Tx, user account.Account) (*account.Account, error) {
+func (r *Repository) createAccountTx(ctx context.Context, tx *sql.Tx, account account.Account) (*account.Account, error) {
 
 	builder := r.genSQL.
 		Insert("accounts").
 		Columns(dao.ColumnAccount...).
-		Values(user.ID(), user.CreatedAt(), user.UpdatedAt(), user.Password(), user.Login(), user.Title(), user.URL(), user.Comment()).
-		Suffix("RETURNING \"id\"").
+		Values(
+			account.ID().String(),
+			account.CreatedAt().String(),
+			account.UpdatedAt().String(),
+			account.Password().String(),
+			account.Login().String(),
+			account.Title().String(),
+			account.URL().String(),
+			account.Comment().String(),
+			account.IsDeleted(),
+		).
 		RunWith(tx)
 
 	query, args, err := builder.ToSql()
@@ -48,20 +57,15 @@ func (r *Repository) createAccountTx(ctx context.Context, tx *sql.Tx, user accou
 		return nil, err
 	}
 
-	rows, err := tx.QueryContext(ctx, query, args...)
+	_, err = tx.ExecContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	var daoAccounts []*dao.Account
-	if err = sqlscan.ScanAll(&daoAccounts, rows); err != nil {
-		return nil, err
-	}
-
-	return r.toDomainAccount(daoAccounts[0])
+	return &account, nil
 }
 
-// GetAccount receive a account
+// GetAccount receive account
 func (r *Repository) GetAccount(ctx context.Context) (*account.Account, error) {
 	tx, err := r.db.Begin()
 	if err != nil {

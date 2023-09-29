@@ -21,6 +21,8 @@ var version = "0.0.1"
 func New(
 	ucUserStorage storage.User,
 	ucUserClient client.User,
+	ucAccountStorage storage.Account,
+	ucAccountClient client.Account,
 ) *Delivery {
 
 	rootCmd := &cobra.Command{
@@ -34,9 +36,11 @@ func New(
 	}
 
 	var d = &Delivery{
-		ucUserStorage: ucUserStorage,
-		ucUserClient:  ucUserClient,
-		rootCmd:       rootCmd,
+		ucUserStorage:    ucUserStorage,
+		ucUserClient:     ucUserClient,
+		ucAccountStorage: ucAccountStorage,
+		ucAccountClient:  ucAccountClient,
+		rootCmd:          rootCmd,
 	}
 
 	registerUser := d.registerUser()

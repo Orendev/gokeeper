@@ -9,7 +9,7 @@ import (
 type Account interface {
 	Create(ctx context.Context, account account.Account) (*account.Account, error)
 	Update(ctx context.Context, update account.Account) (*account.Account, error)
-	UserReader
+	AccountReader
 }
 
 // AccountReader user-readable interface

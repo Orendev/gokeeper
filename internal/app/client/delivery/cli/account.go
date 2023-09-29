@@ -23,6 +23,7 @@ func (d *Delivery) createAccount() *cobra.Command {
 		Short:   "Create new account in the service.",
 		Long:    `This command create a new account: Keeper client createAccount --title=<title> --login=<dev@email.com> --password=<password>.`,
 		Run: func(cmd *cobra.Command, args []string) {
+
 			ctx := context.Background()
 			titleObj, err := title.New(createAccountArgs.Title)
 			if err != nil {
@@ -54,7 +55,7 @@ func (d *Delivery) createAccount() *cobra.Command {
 				return
 			}
 
-			dUser, err := domainAccount.New(
+			dAccount, err := domainAccount.New(
 				*titleObj,
 				*loginObj,
 				*passwordObj,
@@ -62,7 +63,7 @@ func (d *Delivery) createAccount() *cobra.Command {
 				*commentObj,
 			)
 
-			ac, err := d.ucAccountStorage.Create(ctx, *dUser)
+			ac, err := d.ucAccountStorage.Create(ctx, *dAccount)
 			if err != nil {
 				fmt.Printf("Error create account: %s\n", err.Error())
 				return
