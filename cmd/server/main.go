@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"log"
+	"time"
+
 	"github.com/Orendev/gokeeper/internal/app/server"
 	"github.com/Orendev/gokeeper/internal/app/server/configs"
 	deliveryGrpc "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc"
@@ -14,7 +17,6 @@ import (
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/store/postgres"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
-	"log"
 )
 
 func main() {
@@ -39,7 +41,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	jwtManager := auth.NewJWTManager(cfg.Auth.CryptoKeyJWT, cfg.Auth.TokenDurationJWT)
+	jwtManager := auth.NewJWTManager(cfg.Auth.CryptoKeyJWT, time.Duration(cfg.Auth.TokenDurationJWT)*time.Second)
 
 	var (
 		ucAccount    = useCaseAccount.New(repoStorage, useCaseAccount.Options{})

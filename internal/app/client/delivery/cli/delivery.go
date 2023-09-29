@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"context"
+
 	"github.com/Orendev/gokeeper/internal/app/client/useCase/client"
 	"github.com/Orendev/gokeeper/internal/app/client/useCase/storage"
 	"github.com/spf13/cobra"
@@ -59,10 +61,16 @@ func New(
 	rootCmd.AddCommand(createAccount)
 	initCreateAccountArgs(createAccount)
 
+	user, err := d.ucUserStorage.Get(context.Background())
+	if err == nil {
+		d.ucUserClient.SetToken(*user)
+	}
+
 	return d
 }
 
 func (d *Delivery) Run() error {
+
 	err := d.rootCmd.Execute()
 	if err != nil {
 		return err

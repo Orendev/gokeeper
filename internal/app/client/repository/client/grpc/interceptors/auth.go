@@ -2,6 +2,7 @@ package interceptors
 
 import (
 	"context"
+
 	"github.com/Orendev/gokeeper/internal/app/client/configs"
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"

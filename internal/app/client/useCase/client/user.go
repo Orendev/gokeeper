@@ -11,6 +11,7 @@ import (
 // User Interface for interaction between delivery and use case
 type User interface {
 	Register(ctx context.Context, user user.User) (*user.User, error)
+	SetToken(user user.User) bool
 	UserReader
 }
 

@@ -15,6 +15,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var ErrNotFoundUser = errors.New("user not found")
+
 // AddUser create a user
 func (r *Repository) AddUser(ctx context.Context, user user.User) (*user.User, error) {
 
@@ -102,7 +104,7 @@ func (r *Repository) getUserTx(ctx context.Context, tx *sql.Tx) (*user.User, err
 	}
 
 	if len(daoUser) == 0 {
-		return nil, errors.New("user not found")
+		return nil, ErrNotFoundUser
 	}
 
 	return r.toDomainUser(daoUser[0])

@@ -12,7 +12,7 @@ import (
 // User Interface for interacting with the use case repository.
 type User interface {
 	RegisterUser(ctx context.Context, user user.User) (*user.User, error)
-	SetToken(ctx context.Context, token token.Token) bool
+	SetToken(token token.Token) bool
 	UserReader
 }
 

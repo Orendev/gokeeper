@@ -66,6 +66,9 @@ func (d *Delivery) CreateAccount(ctx context.Context, req *protobuff.CreateAccou
 	)
 
 	res, err := d.ucAccount.Create(dAccount)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "account create error: %v", err)
+	}
 
 	return converterAccount.ToCreateAccountResponse(res[0]), nil
 }

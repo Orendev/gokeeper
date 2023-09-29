@@ -60,6 +60,6 @@ func (c *Client) RegisterUser(ctx context.Context, user user.User) (*user.User, 
 }
 
 // SetToken install a token User
-func (c *Client) SetToken(ctx context.Context, token token.Token) bool {
+func (c *Client) SetToken(token token.Token) bool {
 	return c.authInterceptor.SetToken(token.String())
 }

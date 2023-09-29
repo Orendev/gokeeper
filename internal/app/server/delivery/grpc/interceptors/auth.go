@@ -2,6 +2,7 @@ package interceptors
 
 import (
 	"context"
+	"strings"
 
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
@@ -66,10 +67,10 @@ func (interceptor *AuthInterceptor) authorize(ctx context.Context, method string
 	}
 
 	for _, role := range accessibleRoles {
-		if role == claims.Role {
+		if strings.Compare(role, claims.Role) == 0 {
 			return nil
 		}
 	}
 
-	return status.Error(codes.PermissionDenied, "no permission to access this RPC")
+	return status.Errorf(codes.PermissionDenied, "no permission to access this RPC")
 }

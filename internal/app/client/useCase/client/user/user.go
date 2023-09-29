@@ -18,3 +18,7 @@ func (uc *UseCase) Register(ctx context.Context, user user.User) (*user.User, er
 
 	return uc.adapterClient.RegisterUser(ctx, user)
 }
+
+func (uc *UseCase) SetToken(user user.User) bool {
+	return uc.adapterClient.SetToken(user.Token())
+}

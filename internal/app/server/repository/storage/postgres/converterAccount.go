@@ -15,16 +15,17 @@ func (r Repository) toCopyFromSourceAccounts(accounts ...*account.Account) pgx.C
 	rows := make([][]interface{}, len(accounts))
 
 	for i, val := range accounts {
+
 		rows[i] = []interface{}{
-			val.ID(),
-			val.UserID(),
-			val.Title().String(),
+			val.ID().String(),
+			val.CreatedAt().UTC(),
+			val.UpdatedAt().UTC(),
+			val.UserID().String(),
 			val.Login().String(),
 			val.Password().String(),
+			val.Title().String(),
+			val.Comment().String(),
 			val.URL().String(),
-			val.Comment(),
-			val.CreatedAt(),
-			val.UpdatedAt(),
 		}
 	}
 	// Use CopyFrom to efficiently insert multiple rows at a time using the PostgreSQL copy protocol

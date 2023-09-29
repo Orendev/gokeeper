@@ -29,8 +29,8 @@ var (
 )
 
 type Options struct {
-	CryptoKeyJWT     string        `env:"CRYPTO_KEY_JWT" env-default:"supersecretkey"`
-	TokenDurationJWT time.Duration `env:"TOKEN_DURATION_JWT"`
+	CryptoKeyJWT     string `env:"CRYPTO_KEY_JWT" env-default:"supersecretkey"`
+	TokenDurationJWT uint64 `env:"TOKEN_DURATION_JWT"`
 }
 
 // Claims — структура утверждений, которая включает стандартные утверждения и
@@ -57,6 +57,7 @@ func (manager *JWTManager) Generate(userID uuid.UUID) (string, error) {
 			ExpiresAt: time.Now().Add(manager.tokenDuration).Unix(),
 		},
 		UserID: userID,
+		Role:   "user",
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
