@@ -9,6 +9,9 @@ service keeperService {
   rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {};
 
   rpc CreateAccount(CreateAccountRequest) returns (CreateAccountResponse) {};
+  rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {};
+  rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse) {};
+  rpc ListAccount(ListAccountRequest) returns (ListAccountResponse);
 }
 
 message RegisterUserRequest {
@@ -44,7 +47,7 @@ message LoginUserResponse{
   string access_token = 7;
 }
 
-message CreateAccountRequest {
+message Account {
   string ID = 1;
   string title = 2;
   string login = 3;
@@ -53,6 +56,42 @@ message CreateAccountRequest {
   string comment = 6;
 }
 
+message CreateAccountRequest {
+  Account data = 1;
+}
+
 message CreateAccountResponse{
   string ID = 1;
+}
+
+message DeleteAccountRequest {
+  string ID = 1;
+}
+
+message DeleteAccountResponse{
+  string ID = 1;
+}
+
+message UpdateAccountRequest {
+  string ID = 1;
+  string title = 2;
+  string login = 3;
+  string password = 4;
+  string URL = 5;
+  string comment = 6;
+}
+
+message UpdateAccountResponse{
+  string ID = 1;
+}
+
+message ListAccountRequest {
+  string type = 1;
+  uint64 limit = 2;
+  uint64 offset = 3;
+
+}
+
+message ListAccountResponse{
+  repeated Account data = 1;
 }

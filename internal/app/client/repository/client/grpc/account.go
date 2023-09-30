@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Client) CreateAccount(ctx context.Context, account account.Account) (uuid.UUID, error) {
-	req := &protobuff.CreateAccountRequest{
+	ac := &protobuff.Account{
 		ID:       account.ID().String(),
 		Title:    account.Title().String(),
 		Login:    account.Login().String(),
@@ -18,6 +18,7 @@ func (c *Client) CreateAccount(ctx context.Context, account account.Account) (uu
 		URL:      account.URL().String(),
 		Comment:  account.Comment().String(),
 	}
+	req := &protobuff.CreateAccountRequest{Data: ac}
 
 	res, err := c.KeeperServiceClient.CreateAccount(ctx, req)
 	if err != nil {

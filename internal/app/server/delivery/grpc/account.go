@@ -18,34 +18,34 @@ import (
 )
 
 func (d *Delivery) CreateAccount(ctx context.Context, req *protobuff.CreateAccountRequest) (*protobuff.CreateAccountResponse, error) {
-	id := converter.StringToUUID(req.GetID())
+	id := converter.StringToUUID(req.Data.GetID())
 
 	userID, err := d.jwtManager.GetAuthIdentifier(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.PermissionDenied, "account authorization error: %v", err)
 	}
 
-	titleObj, err := title.New(req.GetTitle())
+	titleObj, err := title.New(req.Data.GetTitle())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "account title validation error: %v", err)
 	}
 
-	loginObj, err := login.New(req.GetLogin())
+	loginObj, err := login.New(req.Data.GetLogin())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "account login validation error: %v", err)
 	}
 
-	passwordObj, err := password.New(req.GetPassword())
+	passwordObj, err := password.New(req.Data.GetPassword())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "account password validation error: %v", err)
 	}
 
-	urlObj, err := url.New(req.GetURL())
+	urlObj, err := url.New(req.Data.GetURL())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "account url validation error: %v", err)
 	}
 
-	commentObj, err := comment.New(req.GetComment())
+	commentObj, err := comment.New(req.Data.GetComment())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "account comment validation error: %v", err)
 	}
