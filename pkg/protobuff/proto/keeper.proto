@@ -55,10 +55,4 @@ message CreateAccountRequest {
 
 message CreateAccountResponse{
   string ID = 1;
-  string title = 2;
-  string login = 3;
-  string password = 4;
-  string URL = 5;
-  string createdAt = 6;
-  string updatedAt = 7;
 }

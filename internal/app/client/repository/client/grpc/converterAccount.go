@@ -10,9 +10,18 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/Orendev/gokeeper/pkg/type/title"
 	"github.com/Orendev/gokeeper/pkg/type/url"
-
 	"github.com/google/uuid"
 )
+
+func toAccountId(dto dto.CreateAccount) (uuid.UUID, error) {
+
+	id, err := uuid.Parse(dto.ID)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return id, nil
+}
 
 func toDomainAccount(dto dto.Account) (*account.Account, error) {
 

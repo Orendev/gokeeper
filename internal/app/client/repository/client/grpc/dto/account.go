@@ -5,6 +5,10 @@ import (
 	"github.com/mashingan/smapping"
 )
 
+type CreateAccount struct {
+	ID string `json:"id"`
+}
+
 type Account struct {
 	ID        string `json:"id"`
 	Title     string `json:"title"`
@@ -18,10 +22,20 @@ type Account struct {
 }
 
 // FromCreateAccountResponseToDto converts json body request to a CreateAccountResponse struct
-func FromCreateAccountResponseToDto(source *protobuff.CreateAccountResponse) (*Account, error) {
+func FromCreateAccountResponseToDto(source *protobuff.CreateAccountResponse) (*CreateAccount, error) {
 	mapped := smapping.MapFields(source)
 
-	return fromMappedToAccountDto(mapped)
+	return fromMappedToCreateAccountDto(mapped)
+}
+
+func fromMappedToCreateAccountDto(mapped smapping.Mapped) (*CreateAccount, error) {
+	createAccount := CreateAccount{}
+	err := smapping.FillStruct(&createAccount, mapped)
+	if err != nil {
+		return nil, err
+	}
+
+	return &createAccount, nil
 }
 
 func fromMappedToAccountDto(mapped smapping.Mapped) (*Account, error) {

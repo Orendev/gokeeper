@@ -70,21 +70,14 @@ func (d *Delivery) createAccount() *cobra.Command {
 				return
 			}
 
-			accountExternal, err := d.ucAccountClient.Create(ctx, *ac)
+			id, err := d.ucAccountClient.Create(ctx, *ac)
 			if err != nil {
 				fmt.Printf("Error creating an account on a remote server: %s\n", err.Error())
 				return
 			}
 
-			fmt.Printf("ID: %s\nTitle: %s\nLogin: %s\nPassword: %s\nURL: %s\nComment: %s\nCreatedAt: %s\nUpdatedAt: %s\n",
-				accountExternal.ID().String(),
-				accountExternal.Title().String(),
-				accountExternal.Login().String(),
-				accountExternal.Password().String(),
-				accountExternal.URL().String(),
-				accountExternal.Comment().String(),
-				accountExternal.CreatedAt().String(),
-				accountExternal.UpdatedAt().String(),
+			fmt.Printf("The login/password pair of the account has been created with an ID: %s\n",
+				id.String(),
 			)
 
 		},
