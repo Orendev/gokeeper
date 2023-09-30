@@ -2,8 +2,9 @@ package account
 
 import (
 	"context"
-	"github.com/Orendev/gokeeper/internal/app/client/domain/account"
 	"time"
+
+	"github.com/Orendev/gokeeper/internal/app/client/domain/account"
 )
 
 // Create creating account

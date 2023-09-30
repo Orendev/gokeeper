@@ -70,7 +70,13 @@ func main() {
 		ucAccountStorage = useCaseAccountStorage.New(repoSQLite, useCaseAccountStorage.Options{})
 		ucAccountClient  = useCaseAccountClient.New(repoClient, useCaseAccountClient.Options{})
 
-		cli = deliveryCLI.New(ucUserStorage, ucUserClient, ucAccountStorage, ucAccountClient)
+		cli = deliveryCLI.New(
+			ucUserStorage,
+			ucUserClient,
+			ucAccountStorage,
+			ucAccountClient,
+			cfg.Auth.CryptoKeyJWT,
+		)
 	)
 
 	if err := cli.Run(); err != nil {

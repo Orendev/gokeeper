@@ -5,6 +5,7 @@ import (
 
 	"github.com/Orendev/gokeeper/internal/app/client/useCase/client"
 	"github.com/Orendev/gokeeper/internal/app/client/useCase/storage"
+	"github.com/Orendev/gokeeper/pkg/tools/encryption"
 	"github.com/spf13/cobra"
 )
 
@@ -14,6 +15,8 @@ type Delivery struct {
 
 	ucAccountStorage storage.Account
 	ucAccountClient  client.Account
+
+	enc *encryption.Enc
 
 	rootCmd *cobra.Command
 }
@@ -25,6 +28,7 @@ func New(
 	ucUserClient client.User,
 	ucAccountStorage storage.Account,
 	ucAccountClient client.Account,
+	key string,
 ) *Delivery {
 
 	rootCmd := &cobra.Command{
@@ -64,7 +68,10 @@ func New(
 	user, err := d.ucUserStorage.Get(context.Background())
 	if err == nil {
 		d.ucUserClient.SetToken(*user)
+		key = user.ID().String()
 	}
+
+	d.enc = encryption.New(key)
 
 	return d
 }

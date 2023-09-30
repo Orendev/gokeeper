@@ -24,6 +24,12 @@ func (d *Delivery) createAccount() *cobra.Command {
 		Short:   "Create new account in the service.",
 		Long:    `This command create a new account: Keeper client createAccount --title=<title> --login=<dev@email.com> --password=<password>.`,
 		Run: func(cmd *cobra.Command, args []string) {
+			var err error
+			err = account.ToEncCreateAccountArgs(d.enc, &createAccountArgs)
+			if err != nil {
+				fmt.Printf("error when encrypting the account: %s\n", err.Error())
+				return
+			}
 
 			ctx := context.Background()
 			titleObj, err := title.New(createAccountArgs.Title)
