@@ -1,6 +1,7 @@
 package binary
 
 import (
+	"context"
 	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/server/domain/binary"
@@ -8,37 +9,32 @@ import (
 	"github.com/google/uuid"
 )
 
-func (uc *UseCase) Create(binaries ...*binary.BinaryData) ([]*binary.BinaryData, error) {
-	return uc.adapterStorage.CreateBinary(binaries...)
+func (uc *UseCase) Create(ctx context.Context, binaries ...*binary.BinaryData) ([]*binary.BinaryData, error) {
+	return uc.adapterStorage.CreateBinary(ctx, binaries...)
 }
 
-func (uc *UseCase) Update(binaryUpdate binary.BinaryData) (*binary.BinaryData, error) {
-	return uc.adapterStorage.UpdateBinary(binaryUpdate.ID(), func(oldBinary *binary.BinaryData) (*binary.BinaryData, error) {
+func (uc *UseCase) Update(ctx context.Context, binaryUpdate binary.BinaryData) (*binary.BinaryData, error) {
+	return uc.adapterStorage.UpdateBinary(ctx, binaryUpdate.ID(), func(oldBinary *binary.BinaryData) (*binary.BinaryData, error) {
 		return binary.NewWithID(
 			oldBinary.ID(),
 			oldBinary.UserID(),
 			binaryUpdate.Title(),
-			binaryUpdate.Body(),
+			binaryUpdate.Data(),
 			binaryUpdate.Comment(),
-			binaryUpdate.Version(),
 			oldBinary.CreatedAt(),
 			time.Now().UTC(),
 		)
 	})
 }
 
-func (uc *UseCase) Delete(ID uuid.UUID) error {
-	return uc.adapterStorage.DeleteBinary(ID)
+func (uc *UseCase) Delete(ctx context.Context, ID uuid.UUID) error {
+	return uc.adapterStorage.DeleteBinary(ctx, ID)
 }
 
-func (uc *UseCase) List(parameter queryParameter.QueryParameter) ([]*binary.BinaryData, error) {
-	return uc.adapterStorage.ListBinary(parameter)
+func (uc *UseCase) List(ctx context.Context, parameter queryParameter.QueryParameter) ([]*binary.BinaryData, error) {
+	return uc.adapterStorage.ListBinary(ctx, parameter)
 }
 
-func (uc *UseCase) ReadByID(ID uuid.UUID) (response *binary.BinaryData, err error) {
-	return uc.adapterStorage.ReadBinaryByID(ID)
-}
-
-func (uc *UseCase) Count() (uint64, error) {
-	return uc.adapterStorage.CountBinary()
+func (uc *UseCase) Count(ctx context.Context, parameter queryParameter.QueryParameter) (uint64, error) {
+	return uc.adapterStorage.CountBinary(ctx, parameter)
 }

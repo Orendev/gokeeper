@@ -1,6 +1,7 @@
 package text
 
 import (
+	"context"
 	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/server/domain/text"
@@ -8,37 +9,32 @@ import (
 	"github.com/google/uuid"
 )
 
-func (uc *UseCase) Create(texts ...*text.TextData) ([]*text.TextData, error) {
-	return uc.adapterStorage.CreateText(texts...)
+func (uc *UseCase) Create(ctx context.Context, texts ...*text.TextData) ([]*text.TextData, error) {
+	return uc.adapterStorage.CreateText(ctx, texts...)
 }
 
-func (uc *UseCase) Update(textUpdate text.TextData) (*text.TextData, error) {
-	return uc.adapterStorage.UpdateText(textUpdate.ID(), func(oldText *text.TextData) (*text.TextData, error) {
+func (uc *UseCase) Update(ctx context.Context, textUpdate text.TextData) (*text.TextData, error) {
+	return uc.adapterStorage.UpdateText(ctx, textUpdate.ID(), func(oldText *text.TextData) (*text.TextData, error) {
 		return text.NewWithID(
 			oldText.ID(),
 			oldText.UserID(),
 			textUpdate.Title(),
-			textUpdate.Body(),
+			textUpdate.Data(),
 			textUpdate.Comment(),
-			textUpdate.Version(),
 			oldText.CreatedAt(),
 			time.Now().UTC(),
 		)
 	})
 }
 
-func (uc *UseCase) Delete(ID uuid.UUID) error {
-	return uc.adapterStorage.DeleteText(ID)
+func (uc *UseCase) Delete(ctx context.Context, ID uuid.UUID) error {
+	return uc.adapterStorage.DeleteText(ctx, ID)
 }
 
-func (uc *UseCase) List(parameter queryParameter.QueryParameter) ([]*text.TextData, error) {
-	return uc.adapterStorage.ListText(parameter)
+func (uc *UseCase) List(ctx context.Context, parameter queryParameter.QueryParameter) ([]*text.TextData, error) {
+	return uc.adapterStorage.ListText(ctx, parameter)
 }
 
-func (uc *UseCase) ReadByID(ID uuid.UUID) (response *text.TextData, err error) {
-	return uc.adapterStorage.ReadTextByID(ID)
-}
-
-func (uc *UseCase) Count() (uint64, error) {
-	return uc.adapterStorage.CountText()
+func (uc *UseCase) Count(ctx context.Context, parameter queryParameter.QueryParameter) (uint64, error) {
+	return uc.adapterStorage.CountText(ctx, parameter)
 }

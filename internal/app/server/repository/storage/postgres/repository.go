@@ -7,8 +7,11 @@ import (
 	"github.com/Orendev/gokeeper/internal/app/server/configs"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/pkg/errors"
 	"github.com/pressly/goose/v3"
 )
+
+var ErrDataNotFound = errors.Errorf("Data not found")
 
 type Repository struct {
 	db      *pgxpool.Pool

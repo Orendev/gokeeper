@@ -12,6 +12,21 @@ service keeperService {
   rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse) {};
   rpc UpdateAccount(UpdateAccountRequest) returns (UpdateAccountResponse) {};
   rpc ListAccount(ListAccountRequest) returns (ListAccountResponse);
+
+  rpc CreateText(CreateTextRequest) returns (CreateTextResponse) {};
+  rpc DeleteText(DeleteTextRequest) returns (DeleteTextResponse) {};
+  rpc UpdateText(UpdateTextRequest) returns (UpdateTextResponse) {};
+  rpc ListText(ListTextRequest) returns (ListTextResponse);
+
+  rpc CreateBinary(CreateTextRequest) returns (CreateTextResponse) {};
+  rpc DeleteBinary(DeleteTextRequest) returns (DeleteTextResponse) {};
+  rpc UpdateBinary(UpdateTextRequest) returns (UpdateTextResponse) {};
+  rpc ListBinary(ListTextRequest) returns (ListTextResponse);
+
+  rpc CreateCard(CreateTextRequest) returns (CreateTextResponse) {};
+  rpc DeleteCard(DeleteTextRequest) returns (DeleteTextResponse) {};
+  rpc UpdateCard(UpdateTextRequest) returns (UpdateTextResponse) {};
+  rpc ListCard(ListTextRequest) returns (ListTextResponse);
 }
 
 message RegisterUserRequest {
@@ -46,6 +61,8 @@ message LoginUserResponse{
   string updatedAt = 6;
   string access_token = 7;
 }
+
+// Account
 
 message Account {
   string ID = 1;
@@ -99,6 +116,174 @@ message ListAccountRequest {
 
 message ListAccountResponse{
   repeated AccountResponse data = 1;
+  uint64 total = 2;
+  uint64 limit = 3;
+  uint64 offset = 4;
+}
+
+// TextData
+message Text {
+  string ID = 1;
+  string title = 2;
+  bytes data = 3;
+  bytes comment = 4;
+}
+
+message TextResponse {
+  string ID = 1;
+  string title = 2;
+  bytes data = 3;
+  bytes comment = 4;
+  string createdAt = 5;
+  string updatedAt = 6;
+}
+
+message CreateTextRequest {
+  Text data = 1;
+}
+
+message CreateTextResponse{
+  string ID = 1;
+}
+
+message DeleteTextRequest {
+  string ID = 1;
+}
+
+message DeleteTextResponse{
+  string ID = 1;
+}
+
+message UpdateTextRequest {
+  Account data = 1;
+}
+
+message UpdateTextResponse{
+  string ID = 1;
+}
+
+message ListTextRequest {
+  uint64 limit = 1;
+  uint64 offset = 2;
+
+}
+
+message ListTextResponse{
+  repeated TextResponse data = 1;
+  uint64 total = 2;
+  uint64 limit = 3;
+  uint64 offset = 4;
+}
+
+// Binary
+
+message Binary {
+  string ID = 1;
+  string title = 2;
+  bytes data = 3;
+  bytes comment = 4;
+}
+
+message BinaryResponse {
+  string ID = 1;
+  string title = 2;
+  bytes data = 3;
+  bytes comment = 4;
+  string createdAt = 5;
+  string updatedAt = 6;
+}
+
+message CreateBinaryRequest {
+  Text data = 1;
+}
+
+message CreateBinaryResponse{
+  string ID = 1;
+}
+
+message DeleteBinaryRequest {
+  string ID = 1;
+}
+
+message DeleteBinaryResponse{
+  string ID = 1;
+}
+
+message UpdateBinaryRequest {
+  Account data = 1;
+}
+
+message UpdateBinaryResponse{
+  string ID = 1;
+}
+
+message ListBinaryRequest {
+  uint64 limit = 1;
+  uint64 offset = 2;
+
+}
+
+message ListBinaryResponse{
+  repeated BinaryResponse data = 1;
+  uint64 total = 2;
+  uint64 limit = 3;
+  uint64 offset = 4;
+}
+
+// Card
+
+message Card {
+  string ID = 1;
+  bytes cardNumber = 2;
+  bytes cardName = 3;
+  bytes cvc = 4;
+  bytes cardDate = 5;
+  bytes comment = 6;
+}
+
+message CardResponse {
+  string ID = 1;
+  bytes cardNumber = 2;
+  bytes cardName = 3;
+  bytes cvc = 4;
+  bytes cardDate = 5;
+  bytes comment = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+}
+
+message CreateCardRequest {
+  Text data = 1;
+}
+
+message CreateCardResponse{
+  string ID = 1;
+}
+
+message DeleteCardRequest {
+  string ID = 1;
+}
+
+message DeleteCardResponse{
+  string ID = 1;
+}
+
+message UpdateCardRequest {
+  Account data = 1;
+}
+
+message UpdateCardResponse{
+  string ID = 1;
+}
+
+message ListCardRequest {
+  uint64 limit = 1;
+  uint64 offset = 2;
+
+}
+
+message ListCardResponse{
+  repeated CardResponse data = 1;
   uint64 total = 2;
   uint64 limit = 3;
   uint64 offset = 4;

@@ -3,49 +3,38 @@ package card
 import (
 	"time"
 
-	"github.com/Orendev/gokeeper/internal/app/server/domain/card/cvc"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/card/name"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/card/number"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/card/surname"
-	"github.com/Orendev/gokeeper/pkg/type/comment"
-	"github.com/Orendev/gokeeper/pkg/type/version"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
 var (
-	ErrNumberRequired         = errors.New("number is required")
-	ErrExpirationDateRequired = errors.New("expirationDate is required")
-	ErrCVCRequired            = errors.New("CVC is required")
-	ErrUserIDRequired         = errors.New("userID is required")
+	ErrNumberRequired = errors.New("number is required")
+	ErrCVCRequired    = errors.New("CVC is required")
+	ErrUserIDRequired = errors.New("userID is required")
 )
 
 type CardData struct {
-	id             uuid.UUID
-	userID         uuid.UUID
-	number         number.Number
-	name           name.Name
-	surname        surname.Surname
-	cvc            cvc.CVC
-	expirationDate time.Time
-	comment        comment.Comment
-	version        version.Version
-	createdAt      time.Time
-	updatedAt      time.Time
-	deletedAt      time.Time
+	id         uuid.UUID
+	userID     uuid.UUID
+	cardNumber []byte
+	cardName   []byte
+	cvc        []byte
+	cardDate   []byte
+	comment    []byte
+	createdAt  time.Time
+	updatedAt  time.Time
+	isDeleted  bool
 }
 
 // NewWithID - constructor a new instance of Account assets data with an ID.
 func NewWithID(
 	id uuid.UUID,
 	userID uuid.UUID,
-	number number.Number,
-	name name.Name,
-	surname surname.Surname,
-	cvc cvc.CVC,
-	expirationDate time.Time,
-	comment comment.Comment,
-	version version.Version,
+	cardNumber []byte,
+	cardName []byte,
+	cvc []byte,
+	cardDate []byte,
+	comment []byte,
 	createdAt time.Time,
 	updatedAt time.Time,
 ) (*CardData, error) {
@@ -54,11 +43,11 @@ func NewWithID(
 		id = uuid.New()
 	}
 
-	if number.IsEmpty() {
+	if len(cardNumber) == 0 {
 		return nil, ErrNumberRequired
 	}
 
-	if cvc.IsEmpty() {
+	if len(cvc) == 0 {
 		return nil, ErrCVCRequired
 	}
 
@@ -67,37 +56,33 @@ func NewWithID(
 	}
 
 	return &CardData{
-		id:             id,
-		userID:         userID,
-		number:         number,
-		name:           name,
-		surname:        surname,
-		cvc:            cvc,
-		expirationDate: expirationDate,
-		comment:        comment,
-		version:        version,
-		createdAt:      createdAt.UTC(),
-		updatedAt:      updatedAt.UTC(),
+		id:         id,
+		userID:     userID,
+		cardNumber: cardNumber,
+		cardName:   cardName,
+		cvc:        cvc,
+		cardDate:   cardDate,
+		comment:    comment,
+		createdAt:  createdAt.UTC(),
+		updatedAt:  updatedAt.UTC(),
 	}, nil
 }
 
 // New - constructor a new instance of Account.
 func New(
 	userID uuid.UUID,
-	number number.Number,
-	name name.Name,
-	surname surname.Surname,
-	cvc cvc.CVC,
-	expirationDate time.Time,
-	comment comment.Comment,
-	version version.Version,
+	cardNumber []byte,
+	cardName []byte,
+	cvc []byte,
+	cardDate []byte,
+	comment []byte,
 ) (*CardData, error) {
 
-	if number.IsEmpty() {
+	if len(cardNumber) == 0 {
 		return nil, ErrNumberRequired
 	}
 
-	if cvc.IsEmpty() {
+	if len(cvc) == 0 {
 		return nil, ErrCVCRequired
 	}
 
@@ -108,17 +93,16 @@ func New(
 	var timeNow = time.Now().UTC()
 
 	return &CardData{
-		id:             uuid.New(),
-		userID:         userID,
-		number:         number,
-		name:           name,
-		surname:        surname,
-		cvc:            cvc,
-		expirationDate: expirationDate,
-		comment:        comment,
-		version:        version,
-		createdAt:      timeNow,
-		updatedAt:      timeNow,
+		id:         uuid.New(),
+		userID:     userID,
+		cardNumber: cardNumber,
+		cardName:   cardName,
+		cvc:        cvc,
+		cardDate:   cardDate,
+		comment:    comment,
+
+		createdAt: timeNow,
+		updatedAt: timeNow,
 	}, nil
 }
 
@@ -132,38 +116,28 @@ func (d CardData) UserID() uuid.UUID {
 	return d.userID
 }
 
-// Number getter for the field
-func (d CardData) Number() number.Number {
-	return d.number
+// CardNumber getter for the field
+func (d CardData) CardNumber() []byte {
+	return d.cardNumber
 }
 
-// Name getter for the field
-func (d CardData) Name() name.Name {
-	return d.name
-}
-
-// Surname getter for the field
-func (d CardData) Surname() surname.Surname {
-	return d.surname
+// CardName getter for the field
+func (d CardData) CardName() []byte {
+	return d.cardName
 }
 
 // CVC getter for the field
-func (d CardData) CVC() cvc.CVC {
+func (d CardData) CVC() []byte {
 	return d.cvc
 }
 
-// ExpirationDate getter for the field
-func (d CardData) ExpirationDate() time.Time {
-	return d.expirationDate
-}
-
-// Version getter for the field
-func (d CardData) Version() version.Version {
-	return d.version
+// CardDate getter for the field
+func (d CardData) CardDate() []byte {
+	return d.cardDate
 }
 
 // Comment getter for the field
-func (d CardData) Comment() comment.Comment {
+func (d CardData) Comment() []byte {
 	return d.comment
 }
 
@@ -177,12 +151,7 @@ func (d CardData) UpdatedAt() time.Time {
 	return d.updatedAt
 }
 
-// DeletedAt getter for the field
-func (d CardData) DeletedAt() time.Time {
-	return d.deletedAt
-}
-
-// Equal compare two accounts
-func (d CardData) Equal(cardType CardData) bool {
-	return d.id == cardType.id
+// IsDeleted getter for the field
+func (d CardData) IsDeleted() bool {
+	return d.isDeleted
 }

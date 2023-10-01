@@ -1,6 +1,7 @@
 package card
 
 import (
+	"context"
 	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/server/domain/card"
@@ -8,40 +9,34 @@ import (
 	"github.com/google/uuid"
 )
 
-func (uc *UseCase) Create(cards ...*card.CardData) ([]*card.CardData, error) {
-	return uc.adapterStorage.CreateCard(cards...)
+func (uc *UseCase) Create(ctx context.Context, cards ...*card.CardData) ([]*card.CardData, error) {
+	return uc.adapterStorage.CreateCard(ctx, cards...)
 }
 
-func (uc *UseCase) Update(cardUpdate card.CardData) (*card.CardData, error) {
-	return uc.adapterStorage.UpdateCard(cardUpdate.ID(), func(oldCard *card.CardData) (*card.CardData, error) {
+func (uc *UseCase) Update(ctx context.Context, cardUpdate card.CardData) (*card.CardData, error) {
+	return uc.adapterStorage.UpdateCard(ctx, cardUpdate.ID(), func(oldCard *card.CardData) (*card.CardData, error) {
 		return card.NewWithID(
 			oldCard.ID(),
 			oldCard.UserID(),
-			cardUpdate.Number(),
-			cardUpdate.Name(),
-			cardUpdate.Surname(),
+			cardUpdate.CardNumber(),
+			cardUpdate.CardName(),
 			cardUpdate.CVC(),
-			cardUpdate.ExpirationDate(),
+			cardUpdate.CardDate(),
 			cardUpdate.Comment(),
-			cardUpdate.Version(),
 			oldCard.CreatedAt(),
 			time.Now().UTC(),
 		)
 	})
 }
 
-func (uc *UseCase) Delete(ID uuid.UUID) error {
-	return uc.adapterStorage.DeleteCard(ID)
+func (uc *UseCase) Delete(ctx context.Context, ID uuid.UUID) error {
+	return uc.adapterStorage.DeleteCard(ctx, ID)
 }
 
-func (uc *UseCase) List(parameter queryParameter.QueryParameter) ([]*card.CardData, error) {
-	return uc.adapterStorage.ListCard(parameter)
+func (uc *UseCase) List(ctx context.Context, parameter queryParameter.QueryParameter) ([]*card.CardData, error) {
+	return uc.adapterStorage.ListCard(ctx, parameter)
 }
 
-func (uc *UseCase) ReadByID(ID uuid.UUID) (response *card.CardData, err error) {
-	return uc.adapterStorage.ReadCardByID(ID)
-}
-
-func (uc *UseCase) Count() (uint64, error) {
-	return uc.adapterStorage.CountCard()
+func (uc *UseCase) Count(ctx context.Context, parameter queryParameter.QueryParameter) (uint64, error) {
+	return uc.adapterStorage.CountCard(ctx, parameter)
 }
