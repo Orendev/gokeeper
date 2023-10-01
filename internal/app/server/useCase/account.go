@@ -11,14 +11,15 @@ import (
 // Interface for interaction between delivery and use case
 
 type Account interface {
-	Create(accounts ...*account.Account) ([]*account.Account, error)
+	Create(ctx context.Context, accounts ...*account.Account) ([]*account.Account, error)
 	Update(ctx context.Context, update account.Account) (*account.Account, error)
-	Delete(id uuid.UUID) error
+	Delete(ctx context.Context, id uuid.UUID) error
 
 	AccountReader
 }
 
 type AccountReader interface {
-	List(parameter queryParameter.QueryParameter) ([]*account.Account, error)
-	GetByID(id uuid.UUID) (response *account.Account, err error)
+	List(ctx context.Context, parameter queryParameter.QueryParameter) ([]*account.Account, error)
+	GetByID(ctx context.Context, id uuid.UUID) (response *account.Account, err error)
+	Count(ctx context.Context) (uint64, error)
 }

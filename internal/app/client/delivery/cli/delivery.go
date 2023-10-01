@@ -62,8 +62,17 @@ func New(
 	rootCmd.AddCommand(getUser)
 
 	createAccount := d.createAccount()
+	updateAccount := d.updateAccount()
+	deleteAccount := d.deleteAccount()
+	listAccount := d.listAccount()
 	rootCmd.AddCommand(createAccount)
+	rootCmd.AddCommand(updateAccount)
+	rootCmd.AddCommand(deleteAccount)
+	rootCmd.AddCommand(listAccount)
 	initCreateAccountArgs(createAccount)
+	initUpdateAccountArgs(updateAccount)
+	initDeleteAccountArgs(deleteAccount)
+	initListAccountArgs(listAccount)
 
 	user, err := d.ucUserStorage.Get(context.Background())
 	if err == nil {

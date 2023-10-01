@@ -18,13 +18,11 @@ import (
 )
 
 var mappingSortAccount = map[columnCode.ColumnCode]string{
-	"id":      "id",
-	"title":   "title",
-	"version": "version",
+	"id":    "id",
+	"title": "title",
 }
 
-func (r *Repository) CreateAccount(accounts ...*account.Account) ([]*account.Account, error) {
-	var ctx = context.Background()
+func (r *Repository) CreateAccount(ctx context.Context, accounts ...*account.Account) ([]*account.Account, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -130,9 +128,7 @@ func (r *Repository) updateAccountTx(ctx context.Context, tx pgx.Tx, in *account
 	return r.toDomainAccount(daoAccounts[0])
 }
 
-func (r *Repository) DeleteAccount(ID uuid.UUID) error {
-	var ctx = context.Background()
-
+func (r *Repository) DeleteAccount(ctx context.Context, ID uuid.UUID) error {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return err
@@ -173,8 +169,7 @@ func (r *Repository) deleteAccountTx(ctx context.Context, tx pgx.Tx, ID uuid.UUI
 	return nil
 }
 
-func (r *Repository) ListAccount(parameter queryParameter.QueryParameter) ([]*account.Account, error) {
-	var ctx = context.Background()
+func (r *Repository) ListAccount(ctx context.Context, parameter queryParameter.QueryParameter) ([]*account.Account, error) {
 
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
@@ -184,10 +179,6 @@ func (r *Repository) ListAccount(parameter queryParameter.QueryParameter) ([]*ac
 	defer func(ctx context.Context, t pgx.Tx) {
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
-
-	if parameter.Pagination.Limit == 0 {
-		parameter.Pagination.Limit = r.options.DefaultLimit
-	}
 
 	accounts, err := r.listAccountTx(ctx, tx, parameter)
 	if err != nil {
@@ -210,7 +201,13 @@ func (r *Repository) listAccountTx(ctx context.Context, tx pgx.Tx, parameter que
 		"url",
 	).From("accounts")
 
-	builder = builder.Where(squirrel.Eq{"is_deleted": false})
+	if len(parameter.Filters) > 0 {
+		builder = builder.Where(parameter.Filters.Eq())
+	} else {
+		builder = builder.Where(squirrel.Eq{
+			"is_deleted": false,
+		})
+	}
 
 	if len(parameter.Sorts) > 0 {
 		builder = builder.OrderBy(parameter.Sorts.Parsing(mappingSortAccount)...)
@@ -243,8 +240,7 @@ func (r *Repository) listAccountTx(ctx context.Context, tx pgx.Tx, parameter que
 	return r.toDomainAccounts(daoAccounts)
 }
 
-func (r *Repository) GetByIDAccount(ID uuid.UUID) (response *account.Account, err error) {
-	var ctx = context.Background()
+func (r *Repository) GetByIDAccount(ctx context.Context, ID uuid.UUID) (response *account.Account, err error) {
 
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
@@ -300,7 +296,7 @@ func (r *Repository) oneAccountTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) 
 	return r.toDomainAccount(daoAccount[0])
 }
 
-func (r *Repository) CountAccount() (uint64, error) {
+func (r *Repository) CountAccount(ctx context.Context) (uint64, error) {
 	var builder = r.genSQL.Select(
 		"COUNT(id)",
 	).From("accounts")
@@ -312,7 +308,7 @@ func (r *Repository) CountAccount() (uint64, error) {
 		return 0, err
 	}
 
-	var row = r.db.QueryRow(context.Background(), query, args...)
+	var row = r.db.QueryRow(ctx, query, args...)
 	var total uint64
 
 	if err = row.Scan(&total); err != nil {

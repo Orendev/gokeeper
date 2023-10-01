@@ -56,6 +56,17 @@ message Account {
   string comment = 6;
 }
 
+message AccountResponse {
+  string ID = 1;
+  string title = 2;
+  string login = 3;
+  string password = 4;
+  string URL = 5;
+  string comment = 6;
+  string createdAt = 7;
+  string updatedAt = 8;
+}
+
 message CreateAccountRequest {
   Account data = 1;
 }
@@ -73,12 +84,7 @@ message DeleteAccountResponse{
 }
 
 message UpdateAccountRequest {
-  string ID = 1;
-  string title = 2;
-  string login = 3;
-  string password = 4;
-  string URL = 5;
-  string comment = 6;
+  Account data = 1;
 }
 
 message UpdateAccountResponse{
@@ -86,12 +92,14 @@ message UpdateAccountResponse{
 }
 
 message ListAccountRequest {
-  string type = 1;
-  uint64 limit = 2;
-  uint64 offset = 3;
+  uint64 limit = 1;
+  uint64 offset = 2;
 
 }
 
 message ListAccountResponse{
-  repeated Account data = 1;
+  repeated AccountResponse data = 1;
+  uint64 total = 2;
+  uint64 limit = 3;
+  uint64 offset = 4;
 }

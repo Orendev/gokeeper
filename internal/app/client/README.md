@@ -10,3 +10,9 @@
 
 
 > go run cmd/client/main.go createAccount --title=test --login=test@test.ru --password=test --comment=test --url=test.ru
+
+> go run cmd/client/main.go updateAccount --id=uuid --title=test --login=test@test.ru --password=test --comment=test --url=test.ru
+
+> go run cmd/client/main.go deleteAccount --id=uuid
+
+> go run cmd/client/main.go listAccount --limit=<10> --offset=<10>

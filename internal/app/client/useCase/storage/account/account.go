@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/client/domain/account"
+	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
+	"github.com/google/uuid"
 )
 
 // Create creating account
@@ -19,7 +21,17 @@ func (uc *UseCase) Update(ctx context.Context, update account.Account) (*account
 	})
 }
 
-// Get let's get the account
-func (uc *UseCase) Get(ctx context.Context) (*account.Account, error) {
-	return uc.adapterStorage.GetAccount(ctx)
+// Delete the account
+func (uc *UseCase) Delete(ctx context.Context, id uuid.UUID) error {
+	return uc.adapterStorage.DeleteAccount(ctx, id)
+}
+
+// GetByID let's get the account
+func (uc *UseCase) GetByID(ctx context.Context, id uuid.UUID) (*account.Account, error) {
+	return uc.adapterStorage.GetByIDAccount(ctx, id)
+}
+
+// List creating account
+func (uc *UseCase) List(ctx context.Context, parameter queryParameter.QueryParameter) ([]*account.Account, error) {
+	return uc.adapterStorage.ListAccount(ctx, parameter)
 }

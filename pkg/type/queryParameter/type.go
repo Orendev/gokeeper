@@ -1,6 +1,7 @@
 package queryParameter
 
 import (
+	"github.com/Orendev/gokeeper/pkg/type/filter"
 	"github.com/Orendev/gokeeper/pkg/type/pagination"
 	"github.com/Orendev/gokeeper/pkg/type/sort"
 )
@@ -8,5 +9,5 @@ import (
 type QueryParameter struct {
 	Sorts      sort.Sorts
 	Pagination pagination.Pagination
-	/*Тут можно добавить фильтр*/
+	Filters    filter.Filters
 }

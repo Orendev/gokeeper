@@ -13,9 +13,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func toAccountId(dto dto.CreateAccount) (uuid.UUID, error) {
+func toAccountId(value string) (uuid.UUID, error) {
 
-	id, err := uuid.Parse(dto.ID)
+	id, err := uuid.Parse(value)
 	if err != nil {
 		return uuid.Nil, err
 	}
@@ -78,6 +78,22 @@ func toDomainAccount(dto dto.Account) (*account.Account, error) {
 	)
 	if err != nil {
 		return nil, err
+	}
+
+	return result, nil
+}
+
+func toDomainAccounts(dto dto.ListAccount) ([]*account.Account, error) {
+
+	result := make([]*account.Account, len(dto.Data))
+
+	for i, val := range dto.Data {
+		a, err := toDomainAccount(val)
+		if err != nil {
+			return nil, err
+		}
+
+		result[i] = a
 	}
 
 	return result, nil
