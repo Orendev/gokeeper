@@ -1,17 +1,17 @@
 package text
 
 import (
-	"github.com/Orendev/gokeeper/internal/app/server/useCase/adapters/storage"
+	"github.com/Orendev/gokeeper/internal/pkg/useCase/adapters"
 )
 
 type UseCase struct {
-	adapterStorage storage.Text
+	adapterStorage adapters.Text
 	options        Options
 }
 
 type Options struct{}
 
-func New(storage storage.Text, options Options) *UseCase {
+func New(storage adapters.Text, options Options) *UseCase {
 	var uc = &UseCase{
 		adapterStorage: storage,
 	}

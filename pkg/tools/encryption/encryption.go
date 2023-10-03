@@ -77,6 +77,56 @@ func (e *Enc) Decrypt(msg string) (string, error) {
 
 }
 
+func (e *Enc) EncryptByte(src []byte) ([]byte, error) {
+	block, err := aes.NewCipher(e.Key[:])
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce, err := e.getNonce(gcm.NonceSize())
+	if err != nil {
+		return nil, err
+	}
+
+	return gcm.Seal(nil, nonce, src, nil), nil
+}
+
+func (e *Enc) DecryptByte(src []byte) ([]byte, error) {
+
+	block, err := aes.NewCipher(e.Key[:])
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonceSize := gcm.NonceSize()
+	if len(src) < nonceSize {
+		return nil, ErrOpen
+	}
+
+	nonce, err := e.getNonce(gcm.NonceSize())
+	if err != nil {
+		return nil, err
+	}
+
+	ret, err := gcm.Open(nil, nonce, src, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return ret, nil
+
+}
+
 func (e *Enc) getNonce(size int) ([]byte, error) {
 	if len(e.Key) < size {
 		return nil, ErrOpen

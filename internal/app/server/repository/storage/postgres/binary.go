@@ -6,7 +6,8 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/Orendev/gokeeper/internal/app/server/domain/binary"
-	"github.com/Orendev/gokeeper/internal/app/server/repository/storage/postgres/dao"
+	"github.com/Orendev/gokeeper/internal/pkg/repository/dao"
+	"github.com/Orendev/gokeeper/internal/pkg/repository/data"
 	"github.com/Orendev/gokeeper/pkg/tools/transaction"
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/google/uuid"
@@ -14,8 +15,6 @@ import (
 
 	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
 )
-
-var tableNameBinary = "binaries"
 
 func (r *Repository) CreateBinary(ctx context.Context, binaries ...*binary.BinaryData) ([]*binary.BinaryData, error) {
 	tx, err := r.db.Begin(ctx)
@@ -36,20 +35,22 @@ func (r *Repository) CreateBinary(ctx context.Context, binaries ...*binary.Binar
 }
 
 func (r *Repository) createBinaryTx(ctx context.Context, tx pgx.Tx, binaries ...*binary.BinaryData) ([]*binary.BinaryData, error) {
-	if len(binaries) == 0 {
-		return []*binary.BinaryData{}, nil
-	}
+	//if len(binaries) == 0 {
+	//	return []*binary.BinaryData{}, nil
+	//}
+	//
+	//_, err := tx.CopyFrom(
+	//	ctx,
+	//	pgx.Identifier{dao.TableNameBinary},
+	//	dao.ColumnData,
+	//	data.ToCopyFromSourceBinary(binaries...))
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//return binaries, nil
 
-	_, err := tx.CopyFrom(
-		ctx,
-		pgx.Identifier{tableNameBinary},
-		dao.CreateColumnData,
-		r.toCopyFromSourceBinary(binaries...))
-	if err != nil {
-		return nil, err
-	}
-
-	return binaries, nil
+	panic("")
 }
 
 func (r *Repository) UpdateBinary(ctx context.Context, id uuid.UUID, updateFn func(t *binary.BinaryData) (*binary.BinaryData, error)) (*binary.BinaryData, error) {
@@ -77,7 +78,7 @@ func (r *Repository) UpdateBinary(ctx context.Context, id uuid.UUID, updateFn fu
 
 func (r *Repository) updateBinaryTx(ctx context.Context, tx pgx.Tx, in *binary.BinaryData) (*binary.BinaryData, error) {
 
-	builder := r.genSQL.Update(tableNameBinary).
+	builder := r.genSQL.Update(dao.TableNameBinary).
 		Set("user_id", in.UserID()).
 		Set("title", in.Title().String()).
 		Set("data", in.Data()).
@@ -114,7 +115,7 @@ func (r *Repository) updateBinaryTx(ctx context.Context, tx pgx.Tx, in *binary.B
 		return nil, err
 	}
 
-	return r.toDomainBinary(daoBinaries[0])
+	return data.ToDomainBinary(daoBinaries[0])
 }
 
 func (r *Repository) DeleteBinary(ctx context.Context, ID uuid.UUID) error {
@@ -135,7 +136,7 @@ func (r *Repository) DeleteBinary(ctx context.Context, ID uuid.UUID) error {
 }
 
 func (r *Repository) deleteBinaryTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) error {
-	builder := r.genSQL.Update(tableNameBinary).
+	builder := r.genSQL.Update(dao.TableNameBinary).
 		Set("is_deleted", true).
 		Set("updated_at", time.Now().UTC()).
 		Where(squirrel.Eq{"is_deleted": false, "id": ID})
@@ -178,8 +179,8 @@ func (r *Repository) ListBinary(ctx context.Context, parameter queryParameter.Qu
 
 func (r *Repository) listBinaryTx(ctx context.Context, tx pgx.Tx, parameter queryParameter.QueryParameter) ([]*binary.BinaryData, error) {
 	var builder = r.genSQL.Select(
-		dao.CreateColumnData...,
-	).From(tableNameBinary)
+		dao.ColumnData...,
+	).From(dao.TableNameBinary)
 
 	if len(parameter.Filters) > 0 {
 		builder = builder.Where(parameter.Filters.Eq())
@@ -190,7 +191,7 @@ func (r *Repository) listBinaryTx(ctx context.Context, tx pgx.Tx, parameter quer
 	}
 
 	if len(parameter.Sorts) > 0 {
-		builder = builder.OrderBy(parameter.Sorts.Parsing(mappingSortData)...)
+		builder = builder.OrderBy(parameter.Sorts.Parsing(data.SortData)...)
 	} else {
 		builder = builder.OrderBy("created_at DESC")
 	}
@@ -217,13 +218,13 @@ func (r *Repository) listBinaryTx(ctx context.Context, tx pgx.Tx, parameter quer
 		return nil, err
 	}
 
-	return r.toDomainBinaries(daoBinaries)
+	return data.ToDomainBinaries(daoBinaries)
 }
 
 func (r *Repository) CountBinary(ctx context.Context, parameter queryParameter.QueryParameter) (uint64, error) {
 	var builder = r.genSQL.Select(
 		"COUNT(id)",
-	).From(tableNameBinary)
+	).From(dao.TableNameBinary)
 
 	if len(parameter.Filters) > 0 {
 		builder = builder.Where(parameter.Filters.Eq())
@@ -250,8 +251,8 @@ func (r *Repository) CountBinary(ctx context.Context, parameter queryParameter.Q
 
 func (r *Repository) oneBinaryTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) (*binary.BinaryData, error) {
 	var builder = r.genSQL.Select(
-		dao.CreateColumnData...,
-	).From(tableNameBinary)
+		dao.ColumnData...,
+	).From(dao.TableNameBinary)
 
 	builder = builder.Where(squirrel.Eq{"is_deleted": false, "id": ID})
 
@@ -274,5 +275,5 @@ func (r *Repository) oneBinaryTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) (
 		return nil, ErrDataNotFound
 	}
 
-	return r.toDomainBinary(daoBinary[0])
+	return data.ToDomainBinary(daoBinary[0])
 }

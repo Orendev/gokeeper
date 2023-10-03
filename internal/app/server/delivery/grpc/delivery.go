@@ -6,6 +6,7 @@ import (
 
 	"github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/interceptors"
 	"github.com/Orendev/gokeeper/internal/app/server/useCase"
+	useCaseShare "github.com/Orendev/gokeeper/internal/pkg/useCase"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
 	"google.golang.org/grpc"
@@ -21,7 +22,7 @@ type Delivery struct {
 	ucUser    useCase.User
 	ucAccount useCase.Account
 	ucCard    useCase.Card
-	ucText    useCase.Text
+	ucText    useCaseShare.Text
 	ucBinary  useCase.Binary
 	serv      *grpc.Server
 
@@ -33,7 +34,7 @@ func New(
 	ucUser useCase.User,
 	ucAccount useCase.Account,
 	ucCard useCase.Card,
-	ucText useCase.Text,
+	ucText useCaseShare.Text,
 	ucBinary useCase.Binary,
 	jwtManager *auth.JWTManager,
 	o Options) *Delivery {

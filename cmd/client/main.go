@@ -9,6 +9,7 @@ import (
 	useCaseUserClient "github.com/Orendev/gokeeper/internal/app/client/useCase/client/user"
 	useCaseAccountStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/account"
 	useCaseUserStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/user"
+	useCaseTextStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/text"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
 
 	"github.com/Orendev/gokeeper/internal/app/client/configs"
@@ -70,11 +71,16 @@ func main() {
 		ucAccountStorage = useCaseAccountStorage.New(repoSQLite, useCaseAccountStorage.Options{})
 		ucAccountClient  = useCaseAccountClient.New(repoClient, useCaseAccountClient.Options{})
 
+		ucTextStorage = useCaseTextStorage.New(repoSQLite, useCaseTextStorage.Options{})
+		ucTextClient  = useCaseTextStorage.New(repoClient, useCaseTextStorage.Options{})
+
 		cli = deliveryCLI.New(
 			ucUserStorage,
 			ucUserClient,
 			ucAccountStorage,
 			ucAccountClient,
+			ucTextStorage,
+			ucTextClient,
 			cfg.Auth.CryptoKeyJWT,
 		)
 	)

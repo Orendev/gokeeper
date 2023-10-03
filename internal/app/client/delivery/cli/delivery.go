@@ -5,6 +5,7 @@ import (
 
 	"github.com/Orendev/gokeeper/internal/app/client/useCase/client"
 	"github.com/Orendev/gokeeper/internal/app/client/useCase/storage"
+	"github.com/Orendev/gokeeper/internal/pkg/useCase"
 	"github.com/Orendev/gokeeper/pkg/tools/encryption"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +17,11 @@ type Delivery struct {
 	ucAccountStorage storage.Account
 	ucAccountClient  client.Account
 
-	enc *encryption.Enc
+	ucTextStorage useCase.Text
+	ucTextClient  useCase.Text
+
+	userID *string
+	enc    *encryption.Enc
 
 	rootCmd *cobra.Command
 }
@@ -28,6 +33,8 @@ func New(
 	ucUserClient client.User,
 	ucAccountStorage storage.Account,
 	ucAccountClient client.Account,
+	ucTextStorage useCase.Text,
+	ucTextClient useCase.Text,
 	key string,
 ) *Delivery {
 
@@ -46,6 +53,8 @@ func New(
 		ucUserClient:     ucUserClient,
 		ucAccountStorage: ucAccountStorage,
 		ucAccountClient:  ucAccountClient,
+		ucTextStorage:    ucTextStorage,
+		ucTextClient:     ucTextClient,
 		rootCmd:          rootCmd,
 	}
 
@@ -54,17 +63,16 @@ func New(
 	getUser := d.getUser()
 
 	rootCmd.AddCommand(registerUser)
-	initRegisterUserArgs(registerUser)
-
 	rootCmd.AddCommand(loginUser)
-	initLoginUserArgs(loginUser)
-
 	rootCmd.AddCommand(getUser)
+	initRegisterUserArgs(registerUser)
+	initLoginUserArgs(loginUser)
 
 	createAccount := d.createAccount()
 	updateAccount := d.updateAccount()
 	deleteAccount := d.deleteAccount()
 	listAccount := d.listAccount()
+
 	rootCmd.AddCommand(createAccount)
 	rootCmd.AddCommand(updateAccount)
 	rootCmd.AddCommand(deleteAccount)
@@ -74,10 +82,26 @@ func New(
 	initDeleteAccountArgs(deleteAccount)
 	initListAccountArgs(listAccount)
 
+	createText := d.createText()
+	updateText := d.updateText()
+	deleteText := d.deleteText()
+	listText := d.listText()
+	rootCmd.AddCommand(createText)
+	rootCmd.AddCommand(updateText)
+	rootCmd.AddCommand(deleteText)
+	rootCmd.AddCommand(listText)
+	initCreateTextArgs(createText)
+	initUpdateTextArgs(updateText)
+	initDeleteTextArgs(deleteText)
+	initListTextArgs(listText)
+
 	user, err := d.ucUserStorage.Get(context.Background())
 	if err == nil {
 		d.ucUserClient.SetToken(*user)
 		key = user.ID().String()
+		userID := user.ID().String()
+
+		d.userID = &userID
 	}
 
 	d.enc = encryption.New(key)

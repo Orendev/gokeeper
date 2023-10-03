@@ -5,8 +5,9 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/text"
-	"github.com/Orendev/gokeeper/internal/app/server/repository/storage/postgres/dao"
+	"github.com/Orendev/gokeeper/internal/pkg/domain/text"
+	"github.com/Orendev/gokeeper/internal/pkg/repository/dao"
+	"github.com/Orendev/gokeeper/internal/pkg/repository/data"
 	"github.com/Orendev/gokeeper/pkg/tools/transaction"
 	"github.com/georgysavva/scany/v2/pgxscan"
 	"github.com/google/uuid"
@@ -17,7 +18,7 @@ import (
 
 var tableNameText = "texts"
 
-func (r *Repository) CreateText(ctx context.Context, texts ...*text.TextData) ([]*text.TextData, error) {
+func (r *Repository) CreateText(ctx context.Context, text *text.TextData) (*text.TextData, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -27,32 +28,55 @@ func (r *Repository) CreateText(ctx context.Context, texts ...*text.TextData) ([
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
 
-	response, err := r.createTextTx(ctx, tx, texts...)
+	return r.createTextTx(ctx, tx, text)
+}
+
+func (r *Repository) createTextTx(ctx context.Context, tx pgx.Tx, text *text.TextData) (*text.TextData, error) {
+
+	builder := r.genSQL.
+		Insert(dao.TableNameText).
+		Columns(dao.ColumnData...).
+		Values(
+			text.ID().String(),
+			text.CreatedAt(),
+			text.UpdatedAt(),
+			text.UserID().String(),
+			text.Title().String(),
+			text.Data(),
+			text.Comment(),
+			text.IsDeleted(),
+		).
+		Suffix(`RETURNING
+			id,
+			created_at,
+			updated_at,
+			user_id,
+			title,
+			data,
+			comment`,
+		)
+
+	query, args, err := builder.ToSql()
 	if err != nil {
 		return nil, err
 	}
 
-	return response, nil
-}
-
-func (r *Repository) createTextTx(ctx context.Context, tx pgx.Tx, texts ...*text.TextData) ([]*text.TextData, error) {
-	if len(texts) == 0 {
-		return []*text.TextData{}, nil
-	}
-
-	_, err := tx.CopyFrom(
-		ctx,
-		pgx.Identifier{tableNameText},
-		dao.CreateColumnData,
-		r.toCopyFromSourceTexts(texts...))
+	rows, err := tx.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return texts, nil
+	var daoText []*dao.Data
+
+	if err = pgxscan.ScanAll(&daoText, rows); err != nil {
+
+		return nil, err
+	}
+
+	return data.ToDomainText(daoText[0])
 }
 
-func (r *Repository) UpdateText(ctx context.Context, id uuid.UUID, updateFn func(t *text.TextData) (*text.TextData, error)) (*text.TextData, error) {
+func (r *Repository) UpdateText(ctx context.Context, text *text.TextData) (*text.TextData, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -62,30 +86,19 @@ func (r *Repository) UpdateText(ctx context.Context, id uuid.UUID, updateFn func
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
 
-	upText, err := r.oneTextTx(ctx, tx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	in, err := updateFn(upText)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.updateTextTx(ctx, tx, in)
+	return r.updateTextTx(ctx, tx, text)
 }
 
-func (r *Repository) updateTextTx(ctx context.Context, tx pgx.Tx, in *text.TextData) (*text.TextData, error) {
+func (r *Repository) updateTextTx(ctx context.Context, tx pgx.Tx, text *text.TextData) (*text.TextData, error) {
 
 	builder := r.genSQL.Update(tableNameText).
-		Set("user_id", in.UserID()).
-		Set("title", in.Title().String()).
-		Set("data", in.Data()).
-		Set("updated_at", in.UpdatedAt()).
-		Set("comment", in.Comment()).
+		Set("title", text.Title().String()).
+		Set("data", text.Data()).
+		Set("updated_at", text.UpdatedAt()).
+		Set("comment", text.Comment()).
 		Where(squirrel.And{
 			squirrel.Eq{
-				"id":         in.ID(),
+				"id":         text.ID(),
 				"is_deleted": false,
 			},
 		}).
@@ -108,13 +121,13 @@ func (r *Repository) updateTextTx(ctx context.Context, tx pgx.Tx, in *text.TextD
 	if err != nil {
 		return nil, err
 	}
+	var daoText []*dao.Data
 
-	var daoTexts []*dao.Data
-	if err = pgxscan.ScanAll(&daoTexts, rows); err != nil {
+	if err = pgxscan.ScanAll(&daoText, rows); err != nil {
 		return nil, err
 	}
 
-	return r.toDomainText(daoTexts[0])
+	return data.ToDomainText(daoText[0])
 }
 
 func (r *Repository) DeleteText(ctx context.Context, ID uuid.UUID) error {
@@ -127,11 +140,7 @@ func (r *Repository) DeleteText(ctx context.Context, ID uuid.UUID) error {
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
 
-	if err = r.deleteTextTx(ctx, tx, ID); err != nil {
-		return err
-	}
-
-	return nil
+	return r.deleteTextTx(ctx, tx, ID)
 }
 
 func (r *Repository) deleteTextTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) error {
@@ -150,15 +159,12 @@ func (r *Repository) deleteTextTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) 
 		return err
 	}
 
-	var daoTexts []*dao.Data
-	if err = pgxscan.ScanAll(&daoTexts, rows); err != nil {
-		return err
-	}
+	var daoText []*dao.Data
 
-	return nil
+	return pgxscan.ScanAll(&daoText, rows)
 }
 
-func (r *Repository) ListText(ctx context.Context, parameter queryParameter.QueryParameter) ([]*text.TextData, error) {
+func (r *Repository) ListText(ctx context.Context, parameter queryParameter.QueryParameter) (*text.ListTextViewModel, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -173,12 +179,24 @@ func (r *Repository) ListText(ctx context.Context, parameter queryParameter.Quer
 		return nil, err
 	}
 
-	return texts, nil
+	total, err := r.CountText(ctx, parameter)
+	if err != nil {
+		return nil, err
+	}
+
+	list := &text.ListTextViewModel{
+		Data:   texts,
+		Limit:  parameter.Pagination.Limit,
+		Offset: parameter.Pagination.Offset,
+		Total:  total,
+	}
+
+	return list, nil
 }
 
 func (r *Repository) listTextTx(ctx context.Context, tx pgx.Tx, parameter queryParameter.QueryParameter) ([]*text.TextData, error) {
 	var builder = r.genSQL.Select(
-		dao.CreateColumnData...,
+		dao.ColumnData...,
 	).From(tableNameText)
 
 	if len(parameter.Filters) > 0 {
@@ -190,7 +208,7 @@ func (r *Repository) listTextTx(ctx context.Context, tx pgx.Tx, parameter queryP
 	}
 
 	if len(parameter.Sorts) > 0 {
-		builder = builder.OrderBy(parameter.Sorts.Parsing(mappingSortData)...)
+		builder = builder.OrderBy(parameter.Sorts.Parsing(data.SortData)...)
 	} else {
 		builder = builder.OrderBy("created_at DESC")
 	}
@@ -217,7 +235,7 @@ func (r *Repository) listTextTx(ctx context.Context, tx pgx.Tx, parameter queryP
 		return nil, err
 	}
 
-	return r.toDomainTexts(daoTexts)
+	return data.ToDomainTexts(daoTexts)
 }
 
 func (r *Repository) CountText(ctx context.Context, parameter queryParameter.QueryParameter) (uint64, error) {
@@ -246,33 +264,4 @@ func (r *Repository) CountText(ctx context.Context, parameter queryParameter.Que
 	}
 
 	return total, nil
-}
-
-func (r *Repository) oneTextTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) (*text.TextData, error) {
-	var builder = r.genSQL.Select(
-		dao.CreateColumnData...,
-	).From(tableNameText)
-
-	builder = builder.Where(squirrel.Eq{"is_deleted": false, "id": ID})
-
-	query, args, err := builder.ToSql()
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := tx.Query(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	var daoText []*dao.Data
-	if err = pgxscan.ScanAll(&daoText, rows); err != nil {
-		return nil, err
-	}
-
-	if len(daoText) == 0 {
-		return nil, ErrDataNotFound
-	}
-
-	return r.toDomainText(daoText[0])
 }

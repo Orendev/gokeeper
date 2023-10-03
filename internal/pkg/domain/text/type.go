@@ -10,6 +10,13 @@ import (
 
 var ErrUserIDRequired = errors.New("userID is required")
 
+type ListTextViewModel struct {
+	Data   []*TextData `json:"data"`
+	Total  uint64      `json:"total"`
+	Limit  uint64      `json:"limit"`
+	Offset uint64      `json:"offset"`
+}
+
 type TextData struct {
 	id        uuid.UUID
 	userID    uuid.UUID

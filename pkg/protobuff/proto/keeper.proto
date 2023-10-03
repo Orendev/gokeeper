@@ -122,24 +122,25 @@ message ListAccountResponse{
 }
 
 // TextData
-message Text {
+message Data {
   string ID = 1;
   string title = 2;
   bytes data = 3;
   bytes comment = 4;
 }
 
-message TextResponse {
+message DataResponse {
   string ID = 1;
-  string title = 2;
-  bytes data = 3;
-  bytes comment = 4;
-  string createdAt = 5;
-  string updatedAt = 6;
+  string userID = 2;
+  string title = 3;
+  bytes data = 4;
+  bytes comment = 5;
+  string createdAt = 6;
+  string updatedAt = 7;
 }
 
 message CreateTextRequest {
-  Text data = 1;
+  Data data = 1;
 }
 
 message CreateTextResponse{
@@ -155,7 +156,7 @@ message DeleteTextResponse{
 }
 
 message UpdateTextRequest {
-  Account data = 1;
+  Data data = 1;
 }
 
 message UpdateTextResponse{
@@ -169,7 +170,7 @@ message ListTextRequest {
 }
 
 message ListTextResponse{
-  repeated TextResponse data = 1;
+  repeated DataResponse data = 1;
   uint64 total = 2;
   uint64 limit = 3;
   uint64 offset = 4;
@@ -194,7 +195,7 @@ message BinaryResponse {
 }
 
 message CreateBinaryRequest {
-  Text data = 1;
+  Data data = 1;
 }
 
 message CreateBinaryResponse{
@@ -253,7 +254,7 @@ message CardResponse {
 }
 
 message CreateCardRequest {
-  Text data = 1;
+  Data data = 1;
 }
 
 message CreateCardResponse{
