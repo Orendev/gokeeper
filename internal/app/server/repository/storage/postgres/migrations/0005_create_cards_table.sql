@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS cards
     card_number BYTEA NOT NULL,
     card_name BYTEA NOT NULL,
     card_date BYTEA NOT NULL,
-    cvv BYTEA NOT NULL,
+    cvc BYTEA NOT NULL,
     comment bytea,
     is_deleted  boolean      DEFAULT FALSE                  NOT NULL
 );

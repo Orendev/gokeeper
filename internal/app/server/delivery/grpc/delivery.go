@@ -21,9 +21,9 @@ type Delivery struct {
 	protobuff.UnimplementedKeeperServiceServer
 	ucUser    useCase.User
 	ucAccount useCase.Account
-	ucCard    useCase.Card
+	ucCard    useCaseShare.Card
 	ucText    useCaseShare.Text
-	ucBinary  useCase.Binary
+	ucBinary  useCaseShare.Binary
 	serv      *grpc.Server
 
 	jwtManager *auth.JWTManager
@@ -33,9 +33,9 @@ type Delivery struct {
 func New(
 	ucUser useCase.User,
 	ucAccount useCase.Account,
-	ucCard useCase.Card,
+	ucCard useCaseShare.Card,
 	ucText useCaseShare.Text,
-	ucBinary useCase.Binary,
+	ucBinary useCaseShare.Binary,
 	jwtManager *auth.JWTManager,
 	o Options) *Delivery {
 

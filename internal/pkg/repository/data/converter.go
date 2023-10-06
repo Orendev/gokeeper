@@ -1,7 +1,7 @@
 package data
 
 import (
-	"github.com/Orendev/gokeeper/internal/app/server/domain/binary"
+	"github.com/Orendev/gokeeper/internal/pkg/domain/binary"
 	"github.com/Orendev/gokeeper/internal/pkg/domain/text"
 	"github.com/Orendev/gokeeper/internal/pkg/repository/dao"
 	"github.com/Orendev/gokeeper/pkg/type/columnCode"

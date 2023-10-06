@@ -13,5 +13,13 @@ func AccessibleRoles() map[string][]string {
 		ServicePath + "UpdateText":    {"user"},
 		ServicePath + "DeleteText":    {"user"},
 		ServicePath + "ListText":      {"user"},
+		ServicePath + "CreateBinary":  {"user"},
+		ServicePath + "UpdateBinary":  {"user"},
+		ServicePath + "DeleteBinary":  {"user"},
+		ServicePath + "ListBinary":    {"user"},
+		ServicePath + "CreateCard":    {"user"},
+		ServicePath + "UpdateCard":    {"user"},
+		ServicePath + "DeleteCard":    {"user"},
+		ServicePath + "ListCard":      {"user"},
 	}
 }

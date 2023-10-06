@@ -4,12 +4,12 @@ import (
 	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/dto"
-	"github.com/Orendev/gokeeper/internal/pkg/domain/text"
+	"github.com/Orendev/gokeeper/internal/pkg/domain/binary"
 	"github.com/Orendev/gokeeper/pkg/type/title"
 	"github.com/google/uuid"
 )
 
-func ToDomainText(dto dto.Data) (*text.TextData, error) {
+func ToDomainBinary(dto dto.Data) (*binary.BinaryData, error) {
 
 	titleObj, err := title.New(dto.Title)
 	if err != nil {
@@ -36,7 +36,7 @@ func ToDomainText(dto dto.Data) (*text.TextData, error) {
 		return nil, err
 	}
 
-	return text.NewWithID(
+	return binary.NewWithID(
 		id,
 		userID,
 		*titleObj,
@@ -47,12 +47,12 @@ func ToDomainText(dto dto.Data) (*text.TextData, error) {
 	)
 }
 
-func ToDomainTexts(dto dto.ListData) ([]*text.TextData, error) {
+func ToDomainBinaries(dto dto.ListData) ([]*binary.BinaryData, error) {
 
-	result := make([]*text.TextData, len(dto.Data))
+	result := make([]*binary.BinaryData, len(dto.Data))
 
 	for i, val := range dto.Data {
-		a, err := ToDomainText(val)
+		a, err := ToDomainBinary(val)
 		if err != nil {
 			return nil, err
 		}

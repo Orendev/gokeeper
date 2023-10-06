@@ -9,6 +9,8 @@ import (
 	useCaseUserClient "github.com/Orendev/gokeeper/internal/app/client/useCase/client/user"
 	useCaseAccountStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/account"
 	useCaseUserStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/user"
+	useCaseBinaryStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/binary"
+	useCaseCardStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/card"
 	useCaseTextStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/text"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
 
@@ -71,8 +73,12 @@ func main() {
 		ucAccountStorage = useCaseAccountStorage.New(repoSQLite, useCaseAccountStorage.Options{})
 		ucAccountClient  = useCaseAccountClient.New(repoClient, useCaseAccountClient.Options{})
 
-		ucTextStorage = useCaseTextStorage.New(repoSQLite, useCaseTextStorage.Options{})
-		ucTextClient  = useCaseTextStorage.New(repoClient, useCaseTextStorage.Options{})
+		ucTextStorage   = useCaseTextStorage.New(repoSQLite, useCaseTextStorage.Options{})
+		ucTextClient    = useCaseTextStorage.New(repoClient, useCaseTextStorage.Options{})
+		ucBinaryStorage = useCaseBinaryStorage.New(repoSQLite, useCaseBinaryStorage.Options{})
+		ucBinaryClient  = useCaseBinaryStorage.New(repoClient, useCaseBinaryStorage.Options{})
+		ucCardStorage   = useCaseCardStorage.New(repoSQLite, useCaseCardStorage.Options{})
+		ucCardClient    = useCaseCardStorage.New(repoClient, useCaseCardStorage.Options{})
 
 		cli = deliveryCLI.New(
 			ucUserStorage,
@@ -81,6 +87,10 @@ func main() {
 			ucAccountClient,
 			ucTextStorage,
 			ucTextClient,
+			ucBinaryStorage,
+			ucBinaryClient,
+			ucCardStorage,
+			ucCardClient,
 			cfg.Auth.CryptoKeyJWT,
 		)
 	)

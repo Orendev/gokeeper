@@ -13,6 +13,13 @@ var (
 	ErrUserIDRequired = errors.New("userID is required")
 )
 
+type ListCardViewModel struct {
+	Data   []*CardData `json:"data"`
+	Total  uint64      `json:"total"`
+	Limit  uint64      `json:"limit"`
+	Offset uint64      `json:"offset"`
+}
+
 type CardData struct {
 	id         uuid.UUID
 	userID     uuid.UUID

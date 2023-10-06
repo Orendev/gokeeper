@@ -7,7 +7,7 @@ import "github.com/Orendev/gokeeper/internal/pkg/useCase/adapters"
 type Storage struct {
 	User
 	adapters.Text
-	Binary
-	Card
+	adapters.Binary
+	adapters.Card
 	Account
 }

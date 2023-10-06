@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	converterText "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/converter"
+	converterText "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/text"
 	domainText "github.com/Orendev/gokeeper/internal/pkg/domain/text"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
 	"github.com/Orendev/gokeeper/pkg/tools/converter"

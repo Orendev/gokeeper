@@ -4,17 +4,11 @@ import (
 	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/dto"
-	"github.com/Orendev/gokeeper/internal/pkg/domain/text"
-	"github.com/Orendev/gokeeper/pkg/type/title"
+	"github.com/Orendev/gokeeper/internal/pkg/domain/card"
 	"github.com/google/uuid"
 )
 
-func ToDomainText(dto dto.Data) (*text.TextData, error) {
-
-	titleObj, err := title.New(dto.Title)
-	if err != nil {
-		return nil, err
-	}
+func ToDomainCard(dto dto.Card) (*card.CardData, error) {
 
 	id, err := uuid.Parse(dto.ID)
 	if err != nil {
@@ -36,23 +30,25 @@ func ToDomainText(dto dto.Data) (*text.TextData, error) {
 		return nil, err
 	}
 
-	return text.NewWithID(
+	return card.NewWithID(
 		id,
 		userID,
-		*titleObj,
-		dto.Data,
+		dto.CardNumber,
+		dto.CardName,
+		dto.CVC,
+		dto.CardDate,
 		dto.Comment,
 		createdAt,
 		updatedAt,
 	)
 }
 
-func ToDomainTexts(dto dto.ListData) ([]*text.TextData, error) {
+func ToDomainCards(dto dto.ListCard) ([]*card.CardData, error) {
 
-	result := make([]*text.TextData, len(dto.Data))
+	result := make([]*card.CardData, len(dto.Data))
 
 	for i, val := range dto.Data {
-		a, err := ToDomainText(val)
+		a, err := ToDomainCard(val)
 		if err != nil {
 			return nil, err
 		}

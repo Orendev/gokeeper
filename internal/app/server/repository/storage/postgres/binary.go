@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/binary"
+	"github.com/Orendev/gokeeper/internal/pkg/domain/binary"
 	"github.com/Orendev/gokeeper/internal/pkg/repository/dao"
 	"github.com/Orendev/gokeeper/internal/pkg/repository/data"
 	"github.com/Orendev/gokeeper/pkg/tools/transaction"
@@ -16,7 +16,8 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
 )
 
-func (r *Repository) CreateBinary(ctx context.Context, binaries ...*binary.BinaryData) ([]*binary.BinaryData, error) {
+// CreateBinary let's create a block of binary data
+func (r *Repository) CreateBinary(ctx context.Context, binary *binary.BinaryData) (*binary.BinaryData, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -26,7 +27,7 @@ func (r *Repository) CreateBinary(ctx context.Context, binaries ...*binary.Binar
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
 
-	response, err := r.createBinaryTx(ctx, tx, binaries...)
+	response, err := r.createBinaryTx(ctx, tx, binary)
 	if err != nil {
 		return nil, err
 	}
@@ -34,26 +35,51 @@ func (r *Repository) CreateBinary(ctx context.Context, binaries ...*binary.Binar
 	return response, nil
 }
 
-func (r *Repository) createBinaryTx(ctx context.Context, tx pgx.Tx, binaries ...*binary.BinaryData) ([]*binary.BinaryData, error) {
-	//if len(binaries) == 0 {
-	//	return []*binary.BinaryData{}, nil
-	//}
-	//
-	//_, err := tx.CopyFrom(
-	//	ctx,
-	//	pgx.Identifier{dao.TableNameBinary},
-	//	dao.ColumnData,
-	//	data.ToCopyFromSourceBinary(binaries...))
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//return binaries, nil
+func (r *Repository) createBinaryTx(ctx context.Context, tx pgx.Tx, binary *binary.BinaryData) (*binary.BinaryData, error) {
+	builder := r.genSQL.
+		Insert(dao.TableNameBinary).
+		Columns(dao.ColumnData...).
+		Values(
+			binary.ID().String(),
+			binary.CreatedAt(),
+			binary.UpdatedAt(),
+			binary.UserID().String(),
+			binary.Title().String(),
+			binary.Data(),
+			binary.Comment(),
+			binary.IsDeleted(),
+		).
+		Suffix(`RETURNING
+			id,
+			created_at,
+			updated_at,
+			user_id,
+			title,
+			data,
+			comment`,
+		)
 
-	panic("")
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := tx.Query(ctx, query, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	var daoBinary []*dao.Data
+
+	if err = pgxscan.ScanAll(&daoBinary, rows); err != nil {
+
+		return nil, err
+	}
+
+	return data.ToDomainBinary(daoBinary[0])
 }
 
-func (r *Repository) UpdateBinary(ctx context.Context, id uuid.UUID, updateFn func(t *binary.BinaryData) (*binary.BinaryData, error)) (*binary.BinaryData, error) {
+func (r *Repository) UpdateBinary(ctx context.Context, binary *binary.BinaryData) (*binary.BinaryData, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -63,30 +89,19 @@ func (r *Repository) UpdateBinary(ctx context.Context, id uuid.UUID, updateFn fu
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
 
-	upBinary, err := r.oneBinaryTx(ctx, tx, id)
-	if err != nil {
-		return nil, err
-	}
-
-	in, err := updateFn(upBinary)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.updateBinaryTx(ctx, tx, in)
+	return r.updateBinaryTx(ctx, tx, binary)
 }
 
-func (r *Repository) updateBinaryTx(ctx context.Context, tx pgx.Tx, in *binary.BinaryData) (*binary.BinaryData, error) {
+func (r *Repository) updateBinaryTx(ctx context.Context, tx pgx.Tx, binary *binary.BinaryData) (*binary.BinaryData, error) {
 
 	builder := r.genSQL.Update(dao.TableNameBinary).
-		Set("user_id", in.UserID()).
-		Set("title", in.Title().String()).
-		Set("data", in.Data()).
-		Set("updated_at", in.UpdatedAt()).
-		Set("comment", in.Comment()).
+		Set("title", binary.Title().String()).
+		Set("data", binary.Data()).
+		Set("updated_at", binary.UpdatedAt()).
+		Set("comment", binary.Comment()).
 		Where(squirrel.And{
 			squirrel.Eq{
-				"id":         in.ID(),
+				"id":         binary.ID(),
 				"is_deleted": false,
 			},
 		}).
@@ -159,7 +174,7 @@ func (r *Repository) deleteBinaryTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID
 	return nil
 }
 
-func (r *Repository) ListBinary(ctx context.Context, parameter queryParameter.QueryParameter) ([]*binary.BinaryData, error) {
+func (r *Repository) ListBinary(ctx context.Context, parameter queryParameter.QueryParameter) (*binary.ListBinaryViewModel, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -169,12 +184,24 @@ func (r *Repository) ListBinary(ctx context.Context, parameter queryParameter.Qu
 		err = transaction.FinishPGX(ctx, t, err)
 	}(ctx, tx)
 
-	Binaries, err := r.listBinaryTx(ctx, tx, parameter)
+	binaries, err := r.listBinaryTx(ctx, tx, parameter)
 	if err != nil {
 		return nil, err
 	}
 
-	return Binaries, nil
+	total, err := r.CountBinary(ctx, parameter)
+	if err != nil {
+		return nil, err
+	}
+
+	list := &binary.ListBinaryViewModel{
+		Data:   binaries,
+		Limit:  parameter.Pagination.Limit,
+		Offset: parameter.Pagination.Offset,
+		Total:  total,
+	}
+
+	return list, nil
 }
 
 func (r *Repository) listBinaryTx(ctx context.Context, tx pgx.Tx, parameter queryParameter.QueryParameter) ([]*binary.BinaryData, error) {
@@ -247,33 +274,4 @@ func (r *Repository) CountBinary(ctx context.Context, parameter queryParameter.Q
 	}
 
 	return total, nil
-}
-
-func (r *Repository) oneBinaryTx(ctx context.Context, tx pgx.Tx, ID uuid.UUID) (*binary.BinaryData, error) {
-	var builder = r.genSQL.Select(
-		dao.ColumnData...,
-	).From(dao.TableNameBinary)
-
-	builder = builder.Where(squirrel.Eq{"is_deleted": false, "id": ID})
-
-	query, args, err := builder.ToSql()
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := tx.Query(ctx, query, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	var daoBinary []*dao.Data
-	if err = pgxscan.ScanAll(&daoBinary, rows); err != nil {
-		return nil, err
-	}
-
-	if len(daoBinary) == 0 {
-		return nil, ErrDataNotFound
-	}
-
-	return data.ToDomainBinary(daoBinary[0])
 }

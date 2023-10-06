@@ -1,17 +1,17 @@
-package binary
+package card
 
 import (
-	"github.com/Orendev/gokeeper/internal/app/server/useCase/adapters/storage"
+	"github.com/Orendev/gokeeper/internal/pkg/useCase/adapters"
 )
 
 type UseCase struct {
-	adapterStorage storage.Binary
+	adapterStorage adapters.Card
 	options        Options
 }
 
 type Options struct{}
 
-func New(storage storage.Binary, options Options) *UseCase {
+func New(storage adapters.Card, options Options) *UseCase {
 	var uc = &UseCase{
 		adapterStorage: storage,
 	}

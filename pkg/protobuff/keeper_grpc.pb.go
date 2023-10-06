@@ -53,14 +53,14 @@ type KeeperServiceClient interface {
 	DeleteText(ctx context.Context, in *DeleteTextRequest, opts ...grpc.CallOption) (*DeleteTextResponse, error)
 	UpdateText(ctx context.Context, in *UpdateTextRequest, opts ...grpc.CallOption) (*UpdateTextResponse, error)
 	ListText(ctx context.Context, in *ListTextRequest, opts ...grpc.CallOption) (*ListTextResponse, error)
-	CreateBinary(ctx context.Context, in *CreateTextRequest, opts ...grpc.CallOption) (*CreateTextResponse, error)
-	DeleteBinary(ctx context.Context, in *DeleteTextRequest, opts ...grpc.CallOption) (*DeleteTextResponse, error)
-	UpdateBinary(ctx context.Context, in *UpdateTextRequest, opts ...grpc.CallOption) (*UpdateTextResponse, error)
-	ListBinary(ctx context.Context, in *ListTextRequest, opts ...grpc.CallOption) (*ListTextResponse, error)
-	CreateCard(ctx context.Context, in *CreateTextRequest, opts ...grpc.CallOption) (*CreateTextResponse, error)
-	DeleteCard(ctx context.Context, in *DeleteTextRequest, opts ...grpc.CallOption) (*DeleteTextResponse, error)
-	UpdateCard(ctx context.Context, in *UpdateTextRequest, opts ...grpc.CallOption) (*UpdateTextResponse, error)
-	ListCard(ctx context.Context, in *ListTextRequest, opts ...grpc.CallOption) (*ListTextResponse, error)
+	CreateBinary(ctx context.Context, in *CreateBinaryRequest, opts ...grpc.CallOption) (*CreateBinaryResponse, error)
+	DeleteBinary(ctx context.Context, in *DeleteBinaryRequest, opts ...grpc.CallOption) (*DeleteBinaryResponse, error)
+	UpdateBinary(ctx context.Context, in *UpdateBinaryRequest, opts ...grpc.CallOption) (*UpdateBinaryResponse, error)
+	ListBinary(ctx context.Context, in *ListBinaryRequest, opts ...grpc.CallOption) (*ListBinaryResponse, error)
+	CreateCard(ctx context.Context, in *CreateCardRequest, opts ...grpc.CallOption) (*CreateCardResponse, error)
+	DeleteCard(ctx context.Context, in *DeleteCardRequest, opts ...grpc.CallOption) (*DeleteCardResponse, error)
+	UpdateCard(ctx context.Context, in *UpdateCardRequest, opts ...grpc.CallOption) (*UpdateCardResponse, error)
+	ListCard(ctx context.Context, in *ListCardRequest, opts ...grpc.CallOption) (*ListCardResponse, error)
 }
 
 type keeperServiceClient struct {
@@ -161,8 +161,8 @@ func (c *keeperServiceClient) ListText(ctx context.Context, in *ListTextRequest,
 	return out, nil
 }
 
-func (c *keeperServiceClient) CreateBinary(ctx context.Context, in *CreateTextRequest, opts ...grpc.CallOption) (*CreateTextResponse, error) {
-	out := new(CreateTextResponse)
+func (c *keeperServiceClient) CreateBinary(ctx context.Context, in *CreateBinaryRequest, opts ...grpc.CallOption) (*CreateBinaryResponse, error) {
+	out := new(CreateBinaryResponse)
 	err := c.cc.Invoke(ctx, KeeperService_CreateBinary_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -170,8 +170,8 @@ func (c *keeperServiceClient) CreateBinary(ctx context.Context, in *CreateTextRe
 	return out, nil
 }
 
-func (c *keeperServiceClient) DeleteBinary(ctx context.Context, in *DeleteTextRequest, opts ...grpc.CallOption) (*DeleteTextResponse, error) {
-	out := new(DeleteTextResponse)
+func (c *keeperServiceClient) DeleteBinary(ctx context.Context, in *DeleteBinaryRequest, opts ...grpc.CallOption) (*DeleteBinaryResponse, error) {
+	out := new(DeleteBinaryResponse)
 	err := c.cc.Invoke(ctx, KeeperService_DeleteBinary_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -179,8 +179,8 @@ func (c *keeperServiceClient) DeleteBinary(ctx context.Context, in *DeleteTextRe
 	return out, nil
 }
 
-func (c *keeperServiceClient) UpdateBinary(ctx context.Context, in *UpdateTextRequest, opts ...grpc.CallOption) (*UpdateTextResponse, error) {
-	out := new(UpdateTextResponse)
+func (c *keeperServiceClient) UpdateBinary(ctx context.Context, in *UpdateBinaryRequest, opts ...grpc.CallOption) (*UpdateBinaryResponse, error) {
+	out := new(UpdateBinaryResponse)
 	err := c.cc.Invoke(ctx, KeeperService_UpdateBinary_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -188,8 +188,8 @@ func (c *keeperServiceClient) UpdateBinary(ctx context.Context, in *UpdateTextRe
 	return out, nil
 }
 
-func (c *keeperServiceClient) ListBinary(ctx context.Context, in *ListTextRequest, opts ...grpc.CallOption) (*ListTextResponse, error) {
-	out := new(ListTextResponse)
+func (c *keeperServiceClient) ListBinary(ctx context.Context, in *ListBinaryRequest, opts ...grpc.CallOption) (*ListBinaryResponse, error) {
+	out := new(ListBinaryResponse)
 	err := c.cc.Invoke(ctx, KeeperService_ListBinary_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -197,8 +197,8 @@ func (c *keeperServiceClient) ListBinary(ctx context.Context, in *ListTextReques
 	return out, nil
 }
 
-func (c *keeperServiceClient) CreateCard(ctx context.Context, in *CreateTextRequest, opts ...grpc.CallOption) (*CreateTextResponse, error) {
-	out := new(CreateTextResponse)
+func (c *keeperServiceClient) CreateCard(ctx context.Context, in *CreateCardRequest, opts ...grpc.CallOption) (*CreateCardResponse, error) {
+	out := new(CreateCardResponse)
 	err := c.cc.Invoke(ctx, KeeperService_CreateCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -206,8 +206,8 @@ func (c *keeperServiceClient) CreateCard(ctx context.Context, in *CreateTextRequ
 	return out, nil
 }
 
-func (c *keeperServiceClient) DeleteCard(ctx context.Context, in *DeleteTextRequest, opts ...grpc.CallOption) (*DeleteTextResponse, error) {
-	out := new(DeleteTextResponse)
+func (c *keeperServiceClient) DeleteCard(ctx context.Context, in *DeleteCardRequest, opts ...grpc.CallOption) (*DeleteCardResponse, error) {
+	out := new(DeleteCardResponse)
 	err := c.cc.Invoke(ctx, KeeperService_DeleteCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -215,8 +215,8 @@ func (c *keeperServiceClient) DeleteCard(ctx context.Context, in *DeleteTextRequ
 	return out, nil
 }
 
-func (c *keeperServiceClient) UpdateCard(ctx context.Context, in *UpdateTextRequest, opts ...grpc.CallOption) (*UpdateTextResponse, error) {
-	out := new(UpdateTextResponse)
+func (c *keeperServiceClient) UpdateCard(ctx context.Context, in *UpdateCardRequest, opts ...grpc.CallOption) (*UpdateCardResponse, error) {
+	out := new(UpdateCardResponse)
 	err := c.cc.Invoke(ctx, KeeperService_UpdateCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -224,8 +224,8 @@ func (c *keeperServiceClient) UpdateCard(ctx context.Context, in *UpdateTextRequ
 	return out, nil
 }
 
-func (c *keeperServiceClient) ListCard(ctx context.Context, in *ListTextRequest, opts ...grpc.CallOption) (*ListTextResponse, error) {
-	out := new(ListTextResponse)
+func (c *keeperServiceClient) ListCard(ctx context.Context, in *ListCardRequest, opts ...grpc.CallOption) (*ListCardResponse, error) {
+	out := new(ListCardResponse)
 	err := c.cc.Invoke(ctx, KeeperService_ListCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -247,14 +247,14 @@ type KeeperServiceServer interface {
 	DeleteText(context.Context, *DeleteTextRequest) (*DeleteTextResponse, error)
 	UpdateText(context.Context, *UpdateTextRequest) (*UpdateTextResponse, error)
 	ListText(context.Context, *ListTextRequest) (*ListTextResponse, error)
-	CreateBinary(context.Context, *CreateTextRequest) (*CreateTextResponse, error)
-	DeleteBinary(context.Context, *DeleteTextRequest) (*DeleteTextResponse, error)
-	UpdateBinary(context.Context, *UpdateTextRequest) (*UpdateTextResponse, error)
-	ListBinary(context.Context, *ListTextRequest) (*ListTextResponse, error)
-	CreateCard(context.Context, *CreateTextRequest) (*CreateTextResponse, error)
-	DeleteCard(context.Context, *DeleteTextRequest) (*DeleteTextResponse, error)
-	UpdateCard(context.Context, *UpdateTextRequest) (*UpdateTextResponse, error)
-	ListCard(context.Context, *ListTextRequest) (*ListTextResponse, error)
+	CreateBinary(context.Context, *CreateBinaryRequest) (*CreateBinaryResponse, error)
+	DeleteBinary(context.Context, *DeleteBinaryRequest) (*DeleteBinaryResponse, error)
+	UpdateBinary(context.Context, *UpdateBinaryRequest) (*UpdateBinaryResponse, error)
+	ListBinary(context.Context, *ListBinaryRequest) (*ListBinaryResponse, error)
+	CreateCard(context.Context, *CreateCardRequest) (*CreateCardResponse, error)
+	DeleteCard(context.Context, *DeleteCardRequest) (*DeleteCardResponse, error)
+	UpdateCard(context.Context, *UpdateCardRequest) (*UpdateCardResponse, error)
+	ListCard(context.Context, *ListCardRequest) (*ListCardResponse, error)
 	mustEmbedUnimplementedKeeperServiceServer()
 }
 
@@ -292,28 +292,28 @@ func (UnimplementedKeeperServiceServer) UpdateText(context.Context, *UpdateTextR
 func (UnimplementedKeeperServiceServer) ListText(context.Context, *ListTextRequest) (*ListTextResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListText not implemented")
 }
-func (UnimplementedKeeperServiceServer) CreateBinary(context.Context, *CreateTextRequest) (*CreateTextResponse, error) {
+func (UnimplementedKeeperServiceServer) CreateBinary(context.Context, *CreateBinaryRequest) (*CreateBinaryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBinary not implemented")
 }
-func (UnimplementedKeeperServiceServer) DeleteBinary(context.Context, *DeleteTextRequest) (*DeleteTextResponse, error) {
+func (UnimplementedKeeperServiceServer) DeleteBinary(context.Context, *DeleteBinaryRequest) (*DeleteBinaryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteBinary not implemented")
 }
-func (UnimplementedKeeperServiceServer) UpdateBinary(context.Context, *UpdateTextRequest) (*UpdateTextResponse, error) {
+func (UnimplementedKeeperServiceServer) UpdateBinary(context.Context, *UpdateBinaryRequest) (*UpdateBinaryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateBinary not implemented")
 }
-func (UnimplementedKeeperServiceServer) ListBinary(context.Context, *ListTextRequest) (*ListTextResponse, error) {
+func (UnimplementedKeeperServiceServer) ListBinary(context.Context, *ListBinaryRequest) (*ListBinaryResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListBinary not implemented")
 }
-func (UnimplementedKeeperServiceServer) CreateCard(context.Context, *CreateTextRequest) (*CreateTextResponse, error) {
+func (UnimplementedKeeperServiceServer) CreateCard(context.Context, *CreateCardRequest) (*CreateCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateCard not implemented")
 }
-func (UnimplementedKeeperServiceServer) DeleteCard(context.Context, *DeleteTextRequest) (*DeleteTextResponse, error) {
+func (UnimplementedKeeperServiceServer) DeleteCard(context.Context, *DeleteCardRequest) (*DeleteCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
 }
-func (UnimplementedKeeperServiceServer) UpdateCard(context.Context, *UpdateTextRequest) (*UpdateTextResponse, error) {
+func (UnimplementedKeeperServiceServer) UpdateCard(context.Context, *UpdateCardRequest) (*UpdateCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCard not implemented")
 }
-func (UnimplementedKeeperServiceServer) ListCard(context.Context, *ListTextRequest) (*ListTextResponse, error) {
+func (UnimplementedKeeperServiceServer) ListCard(context.Context, *ListCardRequest) (*ListCardResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCard not implemented")
 }
 func (UnimplementedKeeperServiceServer) mustEmbedUnimplementedKeeperServiceServer() {}
@@ -510,7 +510,7 @@ func _KeeperService_ListText_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _KeeperService_CreateBinary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateTextRequest)
+	in := new(CreateBinaryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -522,13 +522,13 @@ func _KeeperService_CreateBinary_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: KeeperService_CreateBinary_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).CreateBinary(ctx, req.(*CreateTextRequest))
+		return srv.(KeeperServiceServer).CreateBinary(ctx, req.(*CreateBinaryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _KeeperService_DeleteBinary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteTextRequest)
+	in := new(DeleteBinaryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -540,13 +540,13 @@ func _KeeperService_DeleteBinary_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: KeeperService_DeleteBinary_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).DeleteBinary(ctx, req.(*DeleteTextRequest))
+		return srv.(KeeperServiceServer).DeleteBinary(ctx, req.(*DeleteBinaryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _KeeperService_UpdateBinary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateTextRequest)
+	in := new(UpdateBinaryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -558,13 +558,13 @@ func _KeeperService_UpdateBinary_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: KeeperService_UpdateBinary_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).UpdateBinary(ctx, req.(*UpdateTextRequest))
+		return srv.(KeeperServiceServer).UpdateBinary(ctx, req.(*UpdateBinaryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _KeeperService_ListBinary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListTextRequest)
+	in := new(ListBinaryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -576,13 +576,13 @@ func _KeeperService_ListBinary_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: KeeperService_ListBinary_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).ListBinary(ctx, req.(*ListTextRequest))
+		return srv.(KeeperServiceServer).ListBinary(ctx, req.(*ListBinaryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _KeeperService_CreateCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateTextRequest)
+	in := new(CreateCardRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -594,13 +594,13 @@ func _KeeperService_CreateCard_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: KeeperService_CreateCard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).CreateCard(ctx, req.(*CreateTextRequest))
+		return srv.(KeeperServiceServer).CreateCard(ctx, req.(*CreateCardRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _KeeperService_DeleteCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteTextRequest)
+	in := new(DeleteCardRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -612,13 +612,13 @@ func _KeeperService_DeleteCard_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: KeeperService_DeleteCard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).DeleteCard(ctx, req.(*DeleteTextRequest))
+		return srv.(KeeperServiceServer).DeleteCard(ctx, req.(*DeleteCardRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _KeeperService_UpdateCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateTextRequest)
+	in := new(UpdateCardRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -630,13 +630,13 @@ func _KeeperService_UpdateCard_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: KeeperService_UpdateCard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).UpdateCard(ctx, req.(*UpdateTextRequest))
+		return srv.(KeeperServiceServer).UpdateCard(ctx, req.(*UpdateCardRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _KeeperService_ListCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListTextRequest)
+	in := new(ListCardRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -648,7 +648,7 @@ func _KeeperService_ListCard_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: KeeperService_ListCard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeeperServiceServer).ListCard(ctx, req.(*ListTextRequest))
+		return srv.(KeeperServiceServer).ListCard(ctx, req.(*ListCardRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

@@ -20,6 +20,12 @@ type Delivery struct {
 	ucTextStorage useCase.Text
 	ucTextClient  useCase.Text
 
+	ucBinaryStorage useCase.Binary
+	ucBinaryClient  useCase.Binary
+
+	ucCardStorage useCase.Card
+	ucCardClient  useCase.Card
+
 	userID *string
 	enc    *encryption.Enc
 
@@ -35,6 +41,12 @@ func New(
 	ucAccountClient client.Account,
 	ucTextStorage useCase.Text,
 	ucTextClient useCase.Text,
+	ucBinaryStorage useCase.Binary,
+	ucBinaryClient useCase.Binary,
+
+	ucCardStorage useCase.Card,
+	ucCardClient useCase.Card,
+
 	key string,
 ) *Delivery {
 
@@ -55,6 +67,10 @@ func New(
 		ucAccountClient:  ucAccountClient,
 		ucTextStorage:    ucTextStorage,
 		ucTextClient:     ucTextClient,
+		ucBinaryStorage:  ucBinaryStorage,
+		ucBinaryClient:   ucBinaryClient,
+		ucCardStorage:    ucCardStorage,
+		ucCardClient:     ucCardClient,
 		rootCmd:          rootCmd,
 	}
 
@@ -94,6 +110,32 @@ func New(
 	initUpdateTextArgs(updateText)
 	initDeleteTextArgs(deleteText)
 	initListTextArgs(listText)
+
+	createBinary := d.createBinary()
+	updateBinary := d.updateBinary()
+	deleteBinary := d.deleteBinary()
+	listBinary := d.listBinary()
+	rootCmd.AddCommand(createBinary)
+	rootCmd.AddCommand(updateBinary)
+	rootCmd.AddCommand(deleteBinary)
+	rootCmd.AddCommand(listBinary)
+	initCreateBinaryArgs(createBinary)
+	initUpdateBinaryArgs(updateBinary)
+	initDeleteBinaryArgs(deleteBinary)
+	initListBinaryArgs(listBinary)
+
+	createCard := d.createCard()
+	updateCard := d.updateCard()
+	deleteCard := d.deleteCard()
+	listCard := d.listCard()
+	rootCmd.AddCommand(createCard)
+	rootCmd.AddCommand(updateCard)
+	rootCmd.AddCommand(deleteCard)
+	rootCmd.AddCommand(listCard)
+	initCreateCardArgs(createCard)
+	initUpdateCardArgs(updateCard)
+	initDeleteCardArgs(deleteCard)
+	initListCardArgs(listCard)
 
 	user, err := d.ucUserStorage.Get(context.Background())
 	if err == nil {

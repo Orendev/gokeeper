@@ -10,6 +10,13 @@ import (
 
 var ErrUserIDRequired = errors.New("userID is required")
 
+type ListBinaryViewModel struct {
+	Data   []*BinaryData `json:"data"`
+	Total  uint64        `json:"total"`
+	Limit  uint64        `json:"limit"`
+	Offset uint64        `json:"offset"`
+}
+
 type BinaryData struct {
 	id        uuid.UUID
 	userID    uuid.UUID

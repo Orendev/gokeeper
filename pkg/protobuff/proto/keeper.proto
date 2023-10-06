@@ -18,15 +18,15 @@ service keeperService {
   rpc UpdateText(UpdateTextRequest) returns (UpdateTextResponse) {};
   rpc ListText(ListTextRequest) returns (ListTextResponse);
 
-  rpc CreateBinary(CreateTextRequest) returns (CreateTextResponse) {};
-  rpc DeleteBinary(DeleteTextRequest) returns (DeleteTextResponse) {};
-  rpc UpdateBinary(UpdateTextRequest) returns (UpdateTextResponse) {};
-  rpc ListBinary(ListTextRequest) returns (ListTextResponse);
+  rpc CreateBinary(CreateBinaryRequest) returns (CreateBinaryResponse) {};
+  rpc DeleteBinary(DeleteBinaryRequest) returns (DeleteBinaryResponse) {};
+  rpc UpdateBinary(UpdateBinaryRequest) returns (UpdateBinaryResponse) {};
+  rpc ListBinary(ListBinaryRequest) returns (ListBinaryResponse);
 
-  rpc CreateCard(CreateTextRequest) returns (CreateTextResponse) {};
-  rpc DeleteCard(DeleteTextRequest) returns (DeleteTextResponse) {};
-  rpc UpdateCard(UpdateTextRequest) returns (UpdateTextResponse) {};
-  rpc ListCard(ListTextRequest) returns (ListTextResponse);
+  rpc CreateCard(CreateCardRequest) returns (CreateCardResponse) {};
+  rpc DeleteCard(DeleteCardRequest) returns (DeleteCardResponse) {};
+  rpc UpdateCard(UpdateCardRequest) returns (UpdateCardResponse) {};
+  rpc ListCard(ListCardRequest) returns (ListCardResponse);
 }
 
 message RegisterUserRequest {
@@ -178,22 +178,6 @@ message ListTextResponse{
 
 // Binary
 
-message Binary {
-  string ID = 1;
-  string title = 2;
-  bytes data = 3;
-  bytes comment = 4;
-}
-
-message BinaryResponse {
-  string ID = 1;
-  string title = 2;
-  bytes data = 3;
-  bytes comment = 4;
-  string createdAt = 5;
-  string updatedAt = 6;
-}
-
 message CreateBinaryRequest {
   Data data = 1;
 }
@@ -211,7 +195,7 @@ message DeleteBinaryResponse{
 }
 
 message UpdateBinaryRequest {
-  Account data = 1;
+  Data data = 1;
 }
 
 message UpdateBinaryResponse{
@@ -225,7 +209,7 @@ message ListBinaryRequest {
 }
 
 message ListBinaryResponse{
-  repeated BinaryResponse data = 1;
+  repeated DataResponse data = 1;
   uint64 total = 2;
   uint64 limit = 3;
   uint64 offset = 4;
@@ -237,7 +221,7 @@ message Card {
   string ID = 1;
   bytes cardNumber = 2;
   bytes cardName = 3;
-  bytes cvc = 4;
+  bytes CVC = 4;
   bytes cardDate = 5;
   bytes comment = 6;
 }
@@ -246,7 +230,7 @@ message CardResponse {
   string ID = 1;
   bytes cardNumber = 2;
   bytes cardName = 3;
-  bytes cvc = 4;
+  bytes CVC = 4;
   bytes cardDate = 5;
   bytes comment = 6;
   string createdAt = 7;
@@ -254,7 +238,7 @@ message CardResponse {
 }
 
 message CreateCardRequest {
-  Data data = 1;
+  Card data = 1;
 }
 
 message CreateCardResponse{
@@ -270,7 +254,7 @@ message DeleteCardResponse{
 }
 
 message UpdateCardRequest {
-  Account data = 1;
+  Card data = 1;
 }
 
 message UpdateCardResponse{
