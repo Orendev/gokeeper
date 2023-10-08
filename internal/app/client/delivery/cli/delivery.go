@@ -1,10 +1,9 @@
 package cli
 
 import (
-	//"context"
-
 	"context"
 
+	"github.com/Orendev/gokeeper/internal/app/client/configs"
 	"github.com/Orendev/gokeeper/internal/pkg/repository"
 	"github.com/Orendev/gokeeper/internal/pkg/useCase"
 	"github.com/Orendev/gokeeper/pkg/tools/encryption"
@@ -38,8 +37,6 @@ type Delivery struct {
 	rootCmd     *cobra.Command
 }
 
-var version = "0.0.1"
-
 func New(
 	ucUserStorage useCase.User,
 	ucUserClient useCase.User,
@@ -59,7 +56,7 @@ func New(
 
 	rootCmd := &cobra.Command{
 		Use:     "keeper",
-		Version: version,
+		Version: configs.BuildVersion,
 		Short:   "Keeper - A simple CLI is a service for storing and protecting your important data",
 		Long:    `It can be used to store and protect your important data`,
 		Run: func(cmd *cobra.Command, args []string) {

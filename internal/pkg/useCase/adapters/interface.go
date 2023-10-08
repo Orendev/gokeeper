@@ -1,8 +1,7 @@
 package adapters
 
-// Interface for interacting with the use case repository.
-
-type Storage struct {
+// Storage Interface for interacting with the use case repository.
+type Storage interface {
 	User
 	Text
 	Binary

@@ -9,17 +9,16 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+var (
+	BuildVersion string = "N/A"
+	BuildDate    string = "N/A"
+)
+
 type ServerGRPC struct {
 	Host       string `env:"GRPC_HOST" env-default:"localhost"`
 	Port       uint   `env:"GRPC_PORT" env-default:"3200"`
 	EnabledTLS bool   `env:"GRPC_ENABLED_TLS" env-default:"false"`
-
-	//UserConfig
 }
-
-//type UserConfig struct {
-//	AccessToken string `env:"USER_TOKEN"`
-//}
 
 // File configuration
 type File struct {
