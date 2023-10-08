@@ -32,7 +32,7 @@ func (c *Client) CreateBinary(ctx context.Context, binary *binary.BinaryData) (*
 	}
 
 	if len(res.GetID()) == 0 {
-		return nil, repository.ErrAccountNotFound
+		return nil, repository.ErrDataNotFound
 	}
 
 	return binary, nil
@@ -58,7 +58,7 @@ func (c *Client) UpdateBinary(ctx context.Context, binary *binary.BinaryData) (*
 	}
 
 	if len(res.GetID()) == 0 {
-		return nil, repository.ErrAccountNotFound
+		return nil, repository.ErrDataNotFound
 	}
 
 	return binary, nil
