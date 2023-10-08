@@ -24,7 +24,13 @@ func (d *Delivery) createBinary() *cobra.Command {
 		Long:    `This command create a new text data: Keeper client createBinary --title=<title> --data=<binary> --comment=<comment>.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := context.Background()
-			createBinaryArgs.UserID = *d.userID
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
+
+			createBinaryArgs.UserID = d.userID
 			dBinary, err := binary.ToEncCreateBinary(d.enc, &createBinaryArgs)
 			if err != nil {
 				fmt.Printf("error when encrypting the text data: %s\n", err.Error())
@@ -59,9 +65,13 @@ func (d *Delivery) updateBinary() *cobra.Command {
 		Short:   "Update a binary data in the service.",
 		Long:    `This command update a account: Keeper client updateBinary --id=<uuid> --title=<title> --data=<binary> --comment=<comment>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
 			ctx := context.Background()
-			updateBinaryArgs.UserID = *d.userID
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
+			updateBinaryArgs.UserID = d.userID
 
 			dbinary, err := binary.ToEncUpdateBinary(d.enc, &updateBinaryArgs)
 			if err != nil {
@@ -97,11 +107,15 @@ func (d *Delivery) deleteBinary() *cobra.Command {
 		Short:   "Delete binary data in the service.",
 		Long:    `This command delete a binary data: Keeper client deleteBinary --id=<id>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
 			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
 			id := converter.StringToUUID(deleteBinaryArgs.ID)
 
-			err := d.ucBinaryStorage.Delete(ctx, id)
+			err = d.ucBinaryStorage.Delete(ctx, id)
 			if err != nil {
 				fmt.Printf("Error delete binary data: %s\n", err.Error())
 				return
@@ -130,8 +144,12 @@ func (d *Delivery) listBinary() *cobra.Command {
 		Short:   "List binary data in the service.",
 		Long:    `This command list a binary data: Keeper client listBinary --limit=<10> --offset=<0>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
 			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
 
 			var parameter queryParameter.QueryParameter
 			parameter.Pagination.Limit = listAccountArgs.Limit

@@ -28,8 +28,15 @@ func (d *Delivery) CreateText(ctx context.Context, req *protobuff.CreateTextRequ
 		return nil, status.Errorf(codes.Internal, "text data title validation error: %v", err)
 	}
 
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
+	createdAt, err := time.Parse(time.RFC3339, req.Data.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAt, err := time.Parse(time.RFC3339, req.Data.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
 
 	dText, err := domainText.NewWithID(
 		id,
@@ -66,8 +73,15 @@ func (d *Delivery) UpdateText(ctx context.Context, req *protobuff.UpdateTextRequ
 		return nil, status.Errorf(codes.Internal, "text data comment validation error: %v", err)
 	}
 
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
+	createdAt, err := time.Parse(time.RFC3339, req.Data.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAt, err := time.Parse(time.RFC3339, req.Data.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
 
 	dText, err := domainText.NewWithID(
 		id,

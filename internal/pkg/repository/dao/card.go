@@ -3,10 +3,16 @@ package dao
 import (
 	"time"
 
+	"github.com/Orendev/gokeeper/internal/pkg/domain/card"
+	"github.com/Orendev/gokeeper/pkg/type/columnCode"
 	"github.com/google/uuid"
 )
 
 var TableNameCard = "cards"
+
+var SortCard = map[columnCode.ColumnCode]string{
+	"id": "id",
+}
 
 type Card struct {
 	ID         uuid.UUID `db:"id"`
@@ -32,4 +38,31 @@ var ColumnCard = []string{
 	"cvc",
 	"comment",
 	"is_deleted",
+}
+
+func ToDomainCard(dao *Card) (*card.CardData, error) {
+
+	return card.NewWithID(
+		dao.ID,
+		dao.UserID,
+		dao.CardNumber,
+		dao.CardName,
+		dao.CVV,
+		dao.CardDate,
+		dao.Comment,
+		dao.CreatedAt,
+		dao.UpdatedAt,
+	)
+}
+
+func ToDomainCards(dao []*Card) ([]*card.CardData, error) {
+	var result = make([]*card.CardData, len(dao))
+	for i, v := range dao {
+		c, err := ToDomainCard(v)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = c
+	}
+	return result, nil
 }

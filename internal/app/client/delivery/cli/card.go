@@ -24,7 +24,12 @@ func (d *Delivery) createCard() *cobra.Command {
 		Long:    `This command create a new card data: Keeper client createCard --name=<title> --number=<card> --number=<date> --number=<cvc> --comment=<comment>.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := context.Background()
-			createCardArgs.UserID = *d.userID
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
+			createCardArgs.UserID = d.userID
 			dCard, err := card.ToEncCreateCard(d.enc, &createCardArgs)
 			if err != nil {
 				fmt.Printf("error when encrypting the card data: %s\n", err.Error())
@@ -61,7 +66,12 @@ func (d *Delivery) updateCard() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			ctx := context.Background()
-			updateCardArgs.UserID = *d.userID
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
+			updateCardArgs.UserID = d.userID
 
 			dcard, err := card.ToEncUpdateCard(d.enc, &updateCardArgs)
 			if err != nil {
@@ -97,11 +107,15 @@ func (d *Delivery) deleteCard() *cobra.Command {
 		Short:   "Delete card data in the service.",
 		Long:    `This command delete a card data: Keeper client deleteCard --id=<id>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
 			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
 			id := converter.StringToUUID(deleteCardArgs.ID)
 
-			err := d.ucCardStorage.Delete(ctx, id)
+			err = d.ucCardStorage.Delete(ctx, id)
 			if err != nil {
 				fmt.Printf("Error delete card data: %s\n", err.Error())
 				return
@@ -130,8 +144,12 @@ func (d *Delivery) listCard() *cobra.Command {
 		Short:   "List card data in the service.",
 		Long:    `This command list a card data: Keeper client listCard --limit=<10> --offset=<0>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
 			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
 
 			var parameter queryParameter.QueryParameter
 			parameter.Pagination.Limit = listAccountArgs.Limit

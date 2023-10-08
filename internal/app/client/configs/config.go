@@ -21,10 +21,16 @@ type ServerGRPC struct {
 //	AccessToken string `env:"USER_TOKEN"`
 //}
 
+// File configuration
+type File struct {
+	FileStoragePath string `env:"FILE_STORAGE_PATH"`
+}
+
 type Config struct {
 	ServerGRPC ServerGRPC
 	Log        logger.Options
 	Auth       auth.Options
+	File       File
 	SQLite     sqlite.Options
 }
 

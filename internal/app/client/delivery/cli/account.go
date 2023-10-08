@@ -3,17 +3,10 @@ package cli
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/client/delivery/cli/account"
-	domainAccount "github.com/Orendev/gokeeper/internal/app/client/domain/account"
 	"github.com/Orendev/gokeeper/pkg/tools/converter"
-	"github.com/Orendev/gokeeper/pkg/type/comment"
-	"github.com/Orendev/gokeeper/pkg/type/login"
-	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
-	"github.com/Orendev/gokeeper/pkg/type/title"
-	"github.com/Orendev/gokeeper/pkg/type/url"
 	"github.com/spf13/cobra"
 )
 
@@ -30,70 +23,35 @@ func (d *Delivery) createAccount() *cobra.Command {
 		Short:   "Create new account in the service.",
 		Long:    `This command create a new account: Keeper client createAccount --title=<title> --login=<dev@email.com> --password=<password>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			var err error
-			err = account.ToEncAccountArgs[account.CreateAccountArgs](d.enc, &createAccountArgs)
+			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
+
+			createAccountArgs.UserID = d.userID
+
+			dAccount, err := account.ToEncCreateAccount(d.enc, &createAccountArgs)
 			if err != nil {
 				fmt.Printf("error when encrypting the account: %s\n", err.Error())
 				return
 			}
 
-			ctx := context.Background()
-			titleObj, err := title.New(createAccountArgs.Title)
-			if err != nil {
-				fmt.Printf("Error title input fields: %s\n", err.Error())
-				return
-			}
-
-			loginObj, err := login.New(createAccountArgs.Login)
-			if err != nil {
-				fmt.Printf("Error login input fields: %s\n", err.Error())
-				return
-			}
-
-			passwordObj, err := password.New(createAccountArgs.Password)
-			if err != nil {
-				fmt.Printf("Error password input fields: %s\n", err.Error())
-				return
-			}
-
-			urlObj, err := url.New(createAccountArgs.URL)
-			if err != nil {
-				fmt.Printf("Error url input fields: %s\n", err.Error())
-				return
-			}
-
-			commentObj, err := comment.New(createAccountArgs.Comment)
-			if err != nil {
-				fmt.Printf("Error comment input fields: %s\n", err.Error())
-				return
-			}
-
-			dAccount, err := domainAccount.New(
-				*titleObj,
-				*loginObj,
-				*passwordObj,
-				*urlObj,
-				*commentObj,
-			)
-			if err != nil {
-				fmt.Printf("Error create domainAccount: %s\n", err.Error())
-				return
-			}
-
-			ac, err := d.ucAccountStorage.Create(ctx, *dAccount)
+			acInternal, err := d.ucAccountStorage.Create(ctx, dAccount)
 			if err != nil {
 				fmt.Printf("Error create account: %s\n", err.Error())
 				return
 			}
 
-			id, err := d.ucAccountClient.Create(ctx, *ac)
+			acExternal, err := d.ucAccountClient.Create(ctx, acInternal)
 			if err != nil {
 				fmt.Printf("Error creating an account on a remote server: %s\n", err.Error())
 				return
 			}
 
 			fmt.Printf("The login/password pair of the account has been created with an ID: %s\n",
-				id.String(),
+				acExternal.ID().String(),
 			)
 
 		},
@@ -108,74 +66,39 @@ func (d *Delivery) updateAccount() *cobra.Command {
 		Short:   "Update a account in the service.",
 		Long:    `This command update a account: Keeper client createAccount --id=<uuid> --title=<title> --login=<dev@email.com> --password=<password>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-			var err error
-			err = account.ToEncAccountArgs[account.UpdateAccountArgs](d.enc, &updateAccountArgs)
+			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
+
+			updateAccountArgs.UserID = d.userID
+			dAccount, err := account.ToEncUpdateAccount(d.enc, &updateAccountArgs)
 			if err != nil {
 				fmt.Printf("error when encrypting the account: %s\n", err.Error())
 				return
 			}
 
-			ctx := context.Background()
-			titleObj, err := title.New(updateAccountArgs.Title)
-			if err != nil {
-				fmt.Printf("Error title input fields: %s\n", err.Error())
-				return
-			}
-
-			loginObj, err := login.New(updateAccountArgs.Login)
-			if err != nil {
-				fmt.Printf("Error login input fields: %s\n", err.Error())
-				return
-			}
-
-			passwordObj, err := password.New(updateAccountArgs.Password)
-			if err != nil {
-				fmt.Printf("Error password input fields: %s\n", err.Error())
-				return
-			}
-
-			urlObj, err := url.New(updateAccountArgs.URL)
-			if err != nil {
-				fmt.Printf("Error url input fields: %s\n", err.Error())
-				return
-			}
-
-			commentObj, err := comment.New(updateAccountArgs.Comment)
-			if err != nil {
-				fmt.Printf("Error comment input fields: %s\n", err.Error())
-				return
-			}
-
-			dAccount, err := domainAccount.NewWithID(
-				converter.StringToUUID(updateAccountArgs.ID),
-				*titleObj,
-				*loginObj,
-				*passwordObj,
-				*urlObj,
-				*commentObj,
-				false,
-				time.Now().UTC(),
-				time.Now().UTC(),
-			)
 			if err != nil {
 				fmt.Printf("Error update domainAccount: %s\n", err.Error())
 				return
 			}
 
-			ac, err := d.ucAccountStorage.Update(ctx, *dAccount)
+			acInternal, err := d.ucAccountStorage.Update(ctx, dAccount)
 			if err != nil {
 				fmt.Printf("Error create account: %s\n", err.Error())
 				return
 			}
 
-			id, err := d.ucAccountClient.Update(ctx, *ac)
+			acExternal, err := d.ucAccountClient.Update(ctx, acInternal)
 			if err != nil {
 				fmt.Printf("Error update an account on a remote server: %s\n", err.Error())
 				return
 			}
 
 			fmt.Printf("The login/password pair of the account has been created with an ID: %s\n",
-				id.String(),
+				acExternal.ID().String(),
 			)
 
 		},
@@ -190,11 +113,15 @@ func (d *Delivery) deleteAccount() *cobra.Command {
 		Short:   "Delete account in the service.",
 		Long:    `This command delete a account: Keeper client deleteAccount --id=<id>.`,
 		Run: func(cmd *cobra.Command, args []string) {
-
 			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
 			id := converter.StringToUUID(deleteAccountArgs.ID)
 
-			err := d.ucAccountStorage.Delete(ctx, id)
+			err = d.ucAccountStorage.Delete(ctx, id)
 			if err != nil {
 				fmt.Printf("Error delete account: %s\n", err.Error())
 				return
@@ -224,18 +151,23 @@ func (d *Delivery) listAccount() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
 
 			var parameter queryParameter.QueryParameter
 			parameter.Pagination.Limit = listAccountArgs.Limit
 			parameter.Pagination.Offset = listAccountArgs.Offset
 
-			accounts, err := d.ucAccountClient.List(ctx, parameter)
+			list, err := d.ucAccountClient.List(ctx, parameter)
 			if err != nil {
 				fmt.Printf("Error list account: %s\n", err.Error())
 				return
 			}
 
-			for _, value := range accounts {
+			for _, value := range list.Data {
 				val, err := account.ToDecAccount(d.enc, value)
 				if err != nil {
 					fmt.Printf("Error list account: %s\n", err.Error())
@@ -245,10 +177,10 @@ func (d *Delivery) listAccount() *cobra.Command {
 				msg := fmt.Sprintf("ID: %s\nTitle: %s\nURL: %s\nComment: %s\nLogin: %s\nPassword: %s\nCreatedAt: %s\nUpdatedAt: %s\nIsDeleted: %v\n",
 					val.ID().String(),
 					val.Title().String(),
-					val.URL().String(),
-					val.Comment().String(),
-					val.Login().String(),
-					val.Password().String(),
+					string(val.URL()),
+					string(val.Comment()),
+					string(val.Login()),
+					string(val.Password()),
 					val.CreatedAt().String(),
 					val.UpdatedAt().String(),
 					val.IsDeleted(),

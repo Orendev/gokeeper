@@ -35,6 +35,8 @@ message RegisterUserRequest {
   string name = 3;
   string password = 4;
   string role = 5;
+  string createdAt = 6;
+  string updatedAt =7;
 }
 
 message RegisterUserResponse{
@@ -67,19 +69,10 @@ message LoginUserResponse{
 message Account {
   string ID = 1;
   string title = 2;
-  string login = 3;
-  string password = 4;
-  string URL = 5;
-  string comment = 6;
-}
-
-message AccountResponse {
-  string ID = 1;
-  string title = 2;
-  string login = 3;
-  string password = 4;
-  string URL = 5;
-  string comment = 6;
+  bytes login = 3;
+  bytes password = 4;
+  bytes URL = 5;
+  bytes comment = 6;
   string createdAt = 7;
   string updatedAt = 8;
 }
@@ -115,7 +108,7 @@ message ListAccountRequest {
 }
 
 message ListAccountResponse{
-  repeated AccountResponse data = 1;
+  repeated Account data = 1;
   uint64 total = 2;
   uint64 limit = 3;
   uint64 offset = 4;
@@ -127,16 +120,8 @@ message Data {
   string title = 2;
   bytes data = 3;
   bytes comment = 4;
-}
-
-message DataResponse {
-  string ID = 1;
-  string userID = 2;
-  string title = 3;
-  bytes data = 4;
-  bytes comment = 5;
-  string createdAt = 6;
-  string updatedAt = 7;
+  string createdAt = 5;
+  string updatedAt = 6;
 }
 
 message CreateTextRequest {
@@ -170,7 +155,7 @@ message ListTextRequest {
 }
 
 message ListTextResponse{
-  repeated DataResponse data = 1;
+  repeated Data data = 1;
   uint64 total = 2;
   uint64 limit = 3;
   uint64 offset = 4;
@@ -209,7 +194,7 @@ message ListBinaryRequest {
 }
 
 message ListBinaryResponse{
-  repeated DataResponse data = 1;
+  repeated Data data = 1;
   uint64 total = 2;
   uint64 limit = 3;
   uint64 offset = 4;
@@ -218,15 +203,6 @@ message ListBinaryResponse{
 // Card
 
 message Card {
-  string ID = 1;
-  bytes cardNumber = 2;
-  bytes cardName = 3;
-  bytes CVC = 4;
-  bytes cardDate = 5;
-  bytes comment = 6;
-}
-
-message CardResponse {
   string ID = 1;
   bytes cardNumber = 2;
   bytes cardName = 3;
@@ -268,7 +244,7 @@ message ListCardRequest {
 }
 
 message ListCardResponse{
-  repeated CardResponse data = 1;
+  repeated Card data = 1;
   uint64 total = 2;
   uint64 limit = 3;
   uint64 offset = 4;

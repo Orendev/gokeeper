@@ -27,13 +27,12 @@ func ToDeleteBinaryResponse(id uuid.UUID) *protobuff.DeleteBinaryResponse {
 }
 
 func ToListBinaryResponse(list *domainBinary.ListBinaryViewModel) *protobuff.ListBinaryResponse {
-	data := []*protobuff.DataResponse{}
+	data := []*protobuff.Data{}
 
 	for _, value := range list.Data {
-		data = append(data, &protobuff.DataResponse{
+		data = append(data, &protobuff.Data{
 			ID:        value.ID().String(),
 			Title:     value.Title().String(),
-			UserID:    value.UserID().String(),
 			Data:      value.Data(),
 			Comment:   value.Comment(),
 			CreatedAt: value.CreatedAt().Format(time.RFC3339),

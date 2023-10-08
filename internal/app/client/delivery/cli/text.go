@@ -24,7 +24,12 @@ func (d *Delivery) createText() *cobra.Command {
 		Long:    `This command create a new text data: Keeper client createText --title=<title> --data=<text text> --comment=<comment>.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			ctx := context.Background()
-			createTextArgs.UserID = *d.userID
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
+			createTextArgs.UserID = d.userID
 			dText, err := text.ToEncCreateText(d.enc, &createTextArgs)
 			if err != nil {
 				fmt.Printf("error when encrypting the text data: %s\n", err.Error())
@@ -61,7 +66,12 @@ func (d *Delivery) updateText() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			ctx := context.Background()
-			updateTextArgs.UserID = *d.userID
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
+			updateTextArgs.UserID = d.userID
 
 			dText, err := text.ToEncUpdateText(d.enc, &updateTextArgs)
 			if err != nil {
@@ -99,9 +109,14 @@ func (d *Delivery) deleteText() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
 			id := converter.StringToUUID(deleteTextArgs.ID)
 
-			err := d.ucTextStorage.Delete(ctx, id)
+			err = d.ucTextStorage.Delete(ctx, id)
 			if err != nil {
 				fmt.Printf("Error delete text data: %s\n", err.Error())
 				return
@@ -132,6 +147,11 @@ func (d *Delivery) listText() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			ctx := context.Background()
+			err := d.Init()
+			if err != nil {
+				fmt.Printf("failed to init client: %s\n", err.Error())
+				return
+			}
 
 			var parameter queryParameter.QueryParameter
 			parameter.Pagination.Limit = listAccountArgs.Limit

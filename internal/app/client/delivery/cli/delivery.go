@@ -1,21 +1,26 @@
 package cli
 
 import (
+	//"context"
+
 	"context"
 
-	"github.com/Orendev/gokeeper/internal/app/client/useCase/client"
-	"github.com/Orendev/gokeeper/internal/app/client/useCase/storage"
+	"github.com/Orendev/gokeeper/internal/pkg/repository"
 	"github.com/Orendev/gokeeper/internal/pkg/useCase"
 	"github.com/Orendev/gokeeper/pkg/tools/encryption"
+	memory "github.com/Orendev/gokeeper/pkg/tools/fileStorage"
+	"github.com/Orendev/gokeeper/pkg/type/email"
+	"github.com/Orendev/gokeeper/pkg/type/password"
+	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
 	"github.com/spf13/cobra"
 )
 
 type Delivery struct {
-	ucUserStorage storage.User
-	ucUserClient  client.User
+	ucUserStorage useCase.User
+	ucUserClient  useCase.User
 
-	ucAccountStorage storage.Account
-	ucAccountClient  client.Account
+	ucAccountStorage useCase.Account
+	ucAccountClient  useCase.Account
 
 	ucTextStorage useCase.Text
 	ucTextClient  useCase.Text
@@ -26,19 +31,20 @@ type Delivery struct {
 	ucCardStorage useCase.Card
 	ucCardClient  useCase.Card
 
-	userID *string
-	enc    *encryption.Enc
-
-	rootCmd *cobra.Command
+	userID      string
+	enc         *encryption.Enc
+	fileStorage *memory.FileStorage
+	key         string
+	rootCmd     *cobra.Command
 }
 
 var version = "0.0.1"
 
 func New(
-	ucUserStorage storage.User,
-	ucUserClient client.User,
-	ucAccountStorage storage.Account,
-	ucAccountClient client.Account,
+	ucUserStorage useCase.User,
+	ucUserClient useCase.User,
+	ucAccountStorage useCase.Account,
+	ucAccountClient useCase.Account,
 	ucTextStorage useCase.Text,
 	ucTextClient useCase.Text,
 	ucBinaryStorage useCase.Binary,
@@ -47,6 +53,7 @@ func New(
 	ucCardStorage useCase.Card,
 	ucCardClient useCase.Card,
 
+	fileStorage *memory.FileStorage,
 	key string,
 ) *Delivery {
 
@@ -71,16 +78,15 @@ func New(
 		ucBinaryClient:   ucBinaryClient,
 		ucCardStorage:    ucCardStorage,
 		ucCardClient:     ucCardClient,
+		fileStorage:      fileStorage,
 		rootCmd:          rootCmd,
 	}
 
 	registerUser := d.registerUser()
 	loginUser := d.loginUser()
-	getUser := d.getUser()
 
 	rootCmd.AddCommand(registerUser)
 	rootCmd.AddCommand(loginUser)
-	rootCmd.AddCommand(getUser)
 	initRegisterUserArgs(registerUser)
 	initLoginUserArgs(loginUser)
 
@@ -137,16 +143,7 @@ func New(
 	initDeleteCardArgs(deleteCard)
 	initListCardArgs(listCard)
 
-	user, err := d.ucUserStorage.Get(context.Background())
-	if err == nil {
-		d.ucUserClient.SetToken(*user)
-		key = user.ID().String()
-		userID := user.ID().String()
-
-		d.userID = &userID
-	}
-
-	d.enc = encryption.New(key)
+	d.key = key
 
 	return d
 }
@@ -157,6 +154,42 @@ func (d *Delivery) Run() error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (d *Delivery) Init() error {
+	ctx := context.Background()
+
+	var parameter queryParameter.QueryParameter
+	parameter.Pagination.Limit = 1
+	parameter.Pagination.Offset = 0
+
+	m, err := d.fileStorage.Memory()
+	if err != nil {
+		return ErrCannotAuthorize
+	}
+
+	e, err := email.New(m.Email)
+	if err != nil {
+		return ErrCannotAuthorize
+	}
+
+	p, err := password.New(m.Password)
+	if err != nil {
+		return ErrCannotAuthorize
+	}
+
+	user, err := d.ucUserStorage.Login(ctx, *e, *p)
+	if err != nil {
+		return repository.ErrNoAuth
+	}
+
+	d.ucUserClient.SetToken(ctx, user)
+	d.key = user.Password().String()
+	d.userID = user.ID().String()
+
+	d.enc = encryption.New(d.key)
 
 	return nil
 }

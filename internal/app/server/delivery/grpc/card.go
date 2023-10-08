@@ -22,8 +22,15 @@ func (d *Delivery) CreateCard(ctx context.Context, req *protobuff.CreateCardRequ
 		return nil, status.Errorf(codes.PermissionDenied, "card data authorization error: %v", err)
 	}
 
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
+	createdAt, err := time.Parse(time.RFC3339, req.Data.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAt, err := time.Parse(time.RFC3339, req.Data.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
 
 	dCard, err := domainCard.NewWithID(
 		id,
@@ -53,8 +60,15 @@ func (d *Delivery) UpdateCard(ctx context.Context, req *protobuff.UpdateCardRequ
 		return nil, status.Errorf(codes.PermissionDenied, "card data authorization error: %v", err)
 	}
 
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
+	createdAt, err := time.Parse(time.RFC3339, req.Data.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAt, err := time.Parse(time.RFC3339, req.Data.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
 
 	dCard, err := domainCard.NewWithID(
 		id,

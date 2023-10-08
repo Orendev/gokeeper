@@ -6,11 +6,14 @@ import (
 	"time"
 
 	"github.com/Orendev/gokeeper/internal/app/client/delivery/cli/user"
-	domainUser "github.com/Orendev/gokeeper/internal/app/client/domain/user"
+	domainUser "github.com/Orendev/gokeeper/internal/pkg/domain/user"
 	"github.com/Orendev/gokeeper/pkg/logger"
+	memory "github.com/Orendev/gokeeper/pkg/tools/fileStorage"
 	"github.com/Orendev/gokeeper/pkg/type/email"
 	"github.com/Orendev/gokeeper/pkg/type/name"
 	"github.com/Orendev/gokeeper/pkg/type/password"
+	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
+	"github.com/Orendev/gokeeper/pkg/type/token"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
 )
@@ -49,15 +52,16 @@ func (d *Delivery) registerUser() *cobra.Command {
 				*passwordUser,
 				*emailUser,
 				*nameUser,
+				*token.New(""),
 			)
 
-			us, err := d.ucUserStorage.Add(ctx, *dUser)
+			_, err = d.ucUserStorage.Create(ctx, dUser)
 			if err != nil {
 				logger.Log.Info("create user", zap.Error(err))
 				return
 			}
 
-			userExternal, err := d.ucUserClient.Register(ctx, *us)
+			userExternal, err := d.ucUserClient.Create(ctx, dUser)
 			if err != nil {
 				logger.Log.Info("register user", zap.Error(err))
 				return
@@ -65,9 +69,19 @@ func (d *Delivery) registerUser() *cobra.Command {
 
 			dUser.SetToken(userExternal.Token())
 
-			_, err = d.ucUserStorage.Update(ctx, *dUser)
+			if !d.ucUserStorage.SetToken(ctx, dUser) {
+				fmt.Printf("Error update token user: %s\n", err.Error())
+				return
+			}
+
+			err = d.fileStorage.Save(memory.Memory{
+				ID:       dUser.ID().String(),
+				Email:    dUser.Email().String(),
+				Password: dUser.Password().String(),
+				Token:    dUser.Token().String(),
+			})
 			if err != nil {
-				logger.Log.Info("update token user", zap.Error(err))
+				logger.Log.Info("register user", zap.Error(err))
 				return
 			}
 		},
@@ -102,84 +116,54 @@ func (d *Delivery) loginUser() *cobra.Command {
 				return
 			}
 
-			var dUser *domainUser.User
+			dUser, err := domainUser.NewWithID(
+				userExternal.ID(),
+				*passwordUser,
+				*emailUser,
+				userExternal.Name(),
+				userExternal.Role(),
+				userExternal.CreatedAt(),
+				time.Now().UTC(),
+			)
 
-			userInternal, err := d.ucUserStorage.Get(ctx)
+			dUser.SetToken(userExternal.Token())
+
+			err = d.fileStorage.Save(memory.Memory{
+				ID:       dUser.ID().String(),
+				Email:    dUser.Email().String(),
+				Password: dUser.Password().String(),
+				Token:    dUser.Token().String(),
+			})
 			if err != nil {
-				fmt.Printf("User locally: %s\n", err.Error())
-
-				dUser, err = domainUser.NewWithID(
-					userExternal.ID(),
-					*passwordUser,
-					*emailUser,
-					userExternal.Role(),
-					userExternal.Name(),
-					userExternal.Token(),
-					userExternal.CreatedAt(),
-					time.Now().UTC(),
-				)
-				if err != nil {
-					fmt.Printf("Error create User locally: %s\n", err.Error())
-					return
-				}
-
-				_, err := d.ucUserStorage.Add(ctx, *dUser)
-				if err != nil {
-					fmt.Printf("Error create User locally: %s\n", err.Error())
-					return
-				}
-
-			} else {
-				dUser, err = domainUser.NewWithID(
-					userInternal.ID(),
-					*passwordUser,
-					*emailUser,
-					userInternal.Role(),
-					userInternal.Name(),
-					userExternal.Token(),
-					userInternal.CreatedAt(),
-					time.Now().UTC(),
-				)
-
-				_, err = d.ucUserStorage.Update(ctx, *dUser)
-				if err != nil {
-					fmt.Printf("Error update token user: %s\n", err.Error())
-					return
-				}
-			}
-
-		},
-	}
-}
-
-func (d *Delivery) getUser() *cobra.Command {
-
-	return &cobra.Command{
-		Use:     "getUser",
-		Aliases: []string{"get"},
-		Short:   "Get user in the service.",
-		Long:    `This command find user: Keeper client getUser.`,
-
-		Run: func(cmd *cobra.Command, args []string) {
-
-			userFind, err := d.ucUserStorage.Get(context.Background())
-			if err != nil {
-				fmt.Println(err.Error())
+				logger.Log.Info("register user", zap.Error(err))
 				return
 			}
 
-			msg := fmt.Sprintf("ID: %s\nName: %s\nEmail: %s\nRole: %s\nToken: %s\nPassword: %s\nCreatedAt: %s\nUpdatedAt: %s\n",
-				userFind.ID().String(),
-				userFind.Name().String(),
-				userFind.Email().String(),
-				userFind.Role().String(),
-				userFind.Token().String(),
-				userFind.Password().String(),
-				userFind.CreatedAt().String(),
-				userFind.UpdatedAt().String(),
-			)
+			var parameter queryParameter.QueryParameter
+			parameter.Pagination.Limit = 1
+			parameter.Pagination.Offset = 0
 
-			fmt.Println(msg)
+			total, err := d.ucUserStorage.Count(ctx, parameter)
+			if err != nil {
+				logger.Log.Info("user authorization", zap.Error(err))
+				return
+			}
+
+			if total == 0 {
+				_, err = d.ucUserStorage.Create(ctx, dUser)
+				if err != nil {
+					logger.Log.Info("create user", zap.Error(err))
+					return
+				}
+
+				return
+			}
+
+			if !d.ucUserStorage.SetToken(ctx, dUser) {
+				fmt.Println("Error update token user")
+				return
+			}
+
 		},
 	}
 }

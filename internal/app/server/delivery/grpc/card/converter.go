@@ -27,10 +27,10 @@ func ToDeleteCardResponse(id uuid.UUID) *protobuff.DeleteCardResponse {
 }
 
 func ToListCardResponse(list *domainCard.ListCardViewModel) *protobuff.ListCardResponse {
-	data := []*protobuff.CardResponse{}
+	data := []*protobuff.Card{}
 
 	for _, value := range list.Data {
-		data = append(data, &protobuff.CardResponse{
+		data = append(data, &protobuff.Card{
 			ID:         value.ID().String(),
 			CardName:   value.CardName(),
 			CardNumber: value.CardNumber(),

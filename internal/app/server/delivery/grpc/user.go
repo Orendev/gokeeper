@@ -5,7 +5,7 @@ import (
 	"time"
 
 	converterUser "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/user"
-	domainUser "github.com/Orendev/gokeeper/internal/app/server/domain/user"
+	domainUser "github.com/Orendev/gokeeper/internal/pkg/domain/user"
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
 	"github.com/Orendev/gokeeper/pkg/tools/converter"
@@ -21,29 +21,29 @@ import (
 )
 
 // RegisterUser creating a new user.
-func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.RegisterUserRequest) (*protobuff.RegisterUserResponse, error) {
+func (d *Delivery) RegisterUser(ctx context.Context, req *protobuff.RegisterUserRequest) (*protobuff.RegisterUserResponse, error) {
 
-	idUser := converter.StringToUUID(request.GetID())
+	idUser := converter.StringToUUID(req.GetID())
 
-	nameUser, err := name.New(request.GetName())
+	nameUser, err := name.New(req.GetName())
 	if err != nil {
 		logger.Log.Error("error create user", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user name validation error: %v", err)
 	}
 
-	roleUser, err := role.New(request.GetRole())
+	roleUser, err := role.New(req.GetRole())
 	if err != nil {
 		logger.Log.Error("error create user", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user role validation error: %v", err)
 	}
 
-	emailUser, err := email.New(request.GetEmail())
+	emailUser, err := email.New(req.GetEmail())
 	if err != nil {
 		logger.Log.Error("error create user", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user email validation error: %v", err)
 	}
 
-	hashPasswordUser, err := hashedPassword.New(request.GetPassword())
+	hashPasswordUser, err := hashedPassword.New(req.GetPassword())
 	if err != nil {
 		logger.Log.Error("error create user", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
@@ -55,8 +55,15 @@ func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.Register
 		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
 	}
 
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
+	createdAt, err := time.Parse(time.RFC3339, req.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAt, err := time.Parse(time.RFC3339, req.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
 
 	dUser, err := domainUser.NewWithID(
 		idUser,
@@ -78,41 +85,33 @@ func (d *Delivery) RegisterUser(ctx context.Context, request *protobuff.Register
 		return nil, status.Errorf(codes.Internal, "cannot generate access token")
 	}
 
-	tokenObject, err := token.New(tok)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot generate access token")
-	}
+	tokenObject := token.New(tok)
 
 	dUser.SetToken(*tokenObject)
 
-	response, err := d.ucUser.Create(dUser)
+	response, err := d.ucUser.Create(context.Background(), dUser)
 	if err != nil {
 		logger.Log.Error("error login", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user creation error: %v", err)
 	}
 
-	return converterUser.ToRegisterUserResponse(response[0]), nil
+	return converterUser.ToRegisterUserResponse(response), nil
 }
 
 // LoginUser user authorization.
-func (d *Delivery) LoginUser(ctx context.Context, request *protobuff.LoginUserRequest) (*protobuff.LoginUserResponse, error) {
-	emailUserObject, err := email.New(request.GetEmail())
+func (d *Delivery) LoginUser(ctx context.Context, req *protobuff.LoginUserRequest) (*protobuff.LoginUserResponse, error) {
+	emailUserObject, err := email.New(req.GetEmail())
 	if err != nil {
-		logger.Log.Error("error login", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user email validation error: %v", err)
 	}
 
-	user, err := d.ucUser.Find(*emailUserObject)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot find user: %v", err)
-	}
-
-	passwordObject, err := password.New(request.GetPassword())
+	passwordObject, err := password.New(req.GetPassword())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "user password validation error: %v", err)
 	}
 
-	if user == nil || !user.IsCorrectPassword(*passwordObject) {
+	user, err := d.ucUser.Login(context.Background(), *emailUserObject, *passwordObject)
+	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "incorrect email/password")
 	}
 
@@ -121,12 +120,13 @@ func (d *Delivery) LoginUser(ctx context.Context, request *protobuff.LoginUserRe
 		return nil, status.Errorf(codes.Internal, "cannot generate access token")
 	}
 
-	tokenObject, err := token.New(tok)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "cannot generate access token")
-	}
+	tokenObject := token.New(tok)
 
 	user.SetToken(*tokenObject)
+
+	if !d.ucUser.SetToken(ctx, user) {
+		return nil, status.Errorf(codes.Internal, "cannot update token user")
+	}
 
 	return converterUser.ToLoginUserResponse(user), nil
 }

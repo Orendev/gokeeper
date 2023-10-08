@@ -5,16 +5,12 @@ import (
 	"time"
 
 	converterAccount "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc/account"
-	"github.com/Orendev/gokeeper/internal/app/server/domain/account"
+	"github.com/Orendev/gokeeper/internal/pkg/domain/account"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
 	"github.com/Orendev/gokeeper/pkg/tools/converter"
-	"github.com/Orendev/gokeeper/pkg/type/comment"
 	"github.com/Orendev/gokeeper/pkg/type/filter"
-	"github.com/Orendev/gokeeper/pkg/type/login"
-	"github.com/Orendev/gokeeper/pkg/type/password"
 	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
 	"github.com/Orendev/gokeeper/pkg/type/title"
-	"github.com/Orendev/gokeeper/pkg/type/url"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -32,37 +28,24 @@ func (d *Delivery) CreateAccount(ctx context.Context, req *protobuff.CreateAccou
 		return nil, status.Errorf(codes.Internal, "account title validation error: %v", err)
 	}
 
-	loginObj, err := login.New(req.Data.GetLogin())
+	createdAt, err := time.Parse(time.RFC3339, req.Data.CreatedAt)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account login validation error: %v", err)
+		return nil, err
 	}
 
-	passwordObj, err := password.New(req.Data.GetPassword())
+	updatedAt, err := time.Parse(time.RFC3339, req.Data.UpdatedAt)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account password validation error: %v", err)
+		return nil, err
 	}
-
-	urlObj, err := url.New(req.Data.GetURL())
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account url validation error: %v", err)
-	}
-
-	commentObj, err := comment.New(req.Data.GetComment())
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account comment validation error: %v", err)
-	}
-
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
 
 	dAccount, err := account.NewWithID(
 		id,
 		userID,
 		*titleObj,
-		*loginObj,
-		*passwordObj,
-		*urlObj,
-		*commentObj,
+		req.Data.Login,
+		req.Data.Password,
+		req.Data.URL,
+		req.Data.Comment,
 		createdAt,
 		updatedAt,
 	)
@@ -72,7 +55,7 @@ func (d *Delivery) CreateAccount(ctx context.Context, req *protobuff.CreateAccou
 		return nil, status.Errorf(codes.Internal, "account create error: %v", err)
 	}
 
-	return converterAccount.ToCreateAccountResponse(res[0]), nil
+	return converterAccount.ToCreateAccountResponse(res), nil
 }
 
 func (d *Delivery) UpdateAccount(ctx context.Context, req *protobuff.UpdateAccountRequest) (*protobuff.UpdateAccountResponse, error) {
@@ -88,42 +71,29 @@ func (d *Delivery) UpdateAccount(ctx context.Context, req *protobuff.UpdateAccou
 		return nil, status.Errorf(codes.Internal, "account title validation error: %v", err)
 	}
 
-	loginObj, err := login.New(req.Data.GetLogin())
+	createdAt, err := time.Parse(time.RFC3339, req.Data.CreatedAt)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account login validation error: %v", err)
+		return nil, err
 	}
 
-	passwordObj, err := password.New(req.Data.GetPassword())
+	updatedAt, err := time.Parse(time.RFC3339, req.Data.UpdatedAt)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account password validation error: %v", err)
+		return nil, err
 	}
-
-	urlObj, err := url.New(req.Data.GetURL())
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account url validation error: %v", err)
-	}
-
-	commentObj, err := comment.New(req.Data.GetComment())
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account comment validation error: %v", err)
-	}
-
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
 
 	dAccount, err := account.NewWithID(
 		id,
 		userID,
 		*titleObj,
-		*loginObj,
-		*passwordObj,
-		*urlObj,
-		*commentObj,
+		req.Data.Login,
+		req.Data.Password,
+		req.Data.URL,
+		req.Data.Comment,
 		createdAt,
 		updatedAt,
 	)
 
-	res, err := d.ucAccount.Update(ctx, *dAccount)
+	res, err := d.ucAccount.Update(ctx, dAccount)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "account update error: %v", err)
 	}
@@ -161,10 +131,5 @@ func (d *Delivery) ListAccount(ctx context.Context, req *protobuff.ListAccountRe
 		return nil, status.Errorf(codes.Internal, "account list error: %v", err)
 	}
 
-	total, err := d.ucAccount.Count(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "account list error: %v", err)
-	}
-
-	return converterAccount.ToListAccountResponse(res, parameter, total), nil
+	return converterAccount.ToListAccountResponse(res), nil
 }

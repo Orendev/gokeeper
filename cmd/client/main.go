@@ -3,20 +3,19 @@ package main
 import (
 	"log"
 
-	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc"
-	"github.com/Orendev/gokeeper/internal/app/client/repository/client/grpc/interceptors"
-	useCaseAccountClient "github.com/Orendev/gokeeper/internal/app/client/useCase/client/account"
-	useCaseUserClient "github.com/Orendev/gokeeper/internal/app/client/useCase/client/user"
-	useCaseAccountStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/account"
-	useCaseUserStorage "github.com/Orendev/gokeeper/internal/app/client/useCase/storage/user"
+	"github.com/Orendev/gokeeper/internal/pkg/repository/storage/grpc"
+	"github.com/Orendev/gokeeper/internal/pkg/repository/storage/grpc/interceptors"
+	repositorySQLite "github.com/Orendev/gokeeper/internal/pkg/repository/storage/sqlite"
+	useCaseAccountStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/account"
 	useCaseBinaryStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/binary"
 	useCaseCardStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/card"
 	useCaseTextStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/text"
+	useCaseUserStorage "github.com/Orendev/gokeeper/internal/pkg/useCase/user"
 	"github.com/Orendev/gokeeper/pkg/tools/auth"
+	memory "github.com/Orendev/gokeeper/pkg/tools/fileStorage"
 
 	"github.com/Orendev/gokeeper/internal/app/client/configs"
 	deliveryCLI "github.com/Orendev/gokeeper/internal/app/client/delivery/cli"
-	repositorySQLite "github.com/Orendev/gokeeper/internal/app/client/repository/storage/sqlite"
 	"github.com/Orendev/gokeeper/pkg/logger"
 	"github.com/Orendev/gokeeper/pkg/store/sqlite"
 )
@@ -61,17 +60,16 @@ func main() {
 	}
 
 	repoClient, err := grpc.New(authInterceptor, cfg.ServerGRPC)
-
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	var (
 		ucUserStorage = useCaseUserStorage.New(repoSQLite, useCaseUserStorage.Options{})
-		ucUserClient  = useCaseUserClient.New(repoClient, useCaseUserClient.Options{})
+		ucUserClient  = useCaseUserStorage.New(repoClient, useCaseUserStorage.Options{})
 
 		ucAccountStorage = useCaseAccountStorage.New(repoSQLite, useCaseAccountStorage.Options{})
-		ucAccountClient  = useCaseAccountClient.New(repoClient, useCaseAccountClient.Options{})
+		ucAccountClient  = useCaseAccountStorage.New(repoClient, useCaseAccountStorage.Options{})
 
 		ucTextStorage   = useCaseTextStorage.New(repoSQLite, useCaseTextStorage.Options{})
 		ucTextClient    = useCaseTextStorage.New(repoClient, useCaseTextStorage.Options{})
@@ -79,20 +77,21 @@ func main() {
 		ucBinaryClient  = useCaseBinaryStorage.New(repoClient, useCaseBinaryStorage.Options{})
 		ucCardStorage   = useCaseCardStorage.New(repoSQLite, useCaseCardStorage.Options{})
 		ucCardClient    = useCaseCardStorage.New(repoClient, useCaseCardStorage.Options{})
+	)
 
-		cli = deliveryCLI.New(
-			ucUserStorage,
-			ucUserClient,
-			ucAccountStorage,
-			ucAccountClient,
-			ucTextStorage,
-			ucTextClient,
-			ucBinaryStorage,
-			ucBinaryClient,
-			ucCardStorage,
-			ucCardClient,
-			cfg.Auth.CryptoKeyJWT,
-		)
+	cli := deliveryCLI.New(
+		ucUserStorage,
+		ucUserClient,
+		ucAccountStorage,
+		ucAccountClient,
+		ucTextStorage,
+		ucTextClient,
+		ucBinaryStorage,
+		ucBinaryClient,
+		ucCardStorage,
+		ucCardClient,
+		memory.NewFileStorage(cfg.File.FileStoragePath),
+		cfg.Auth.CryptoKeyJWT,
 	)
 
 	if err := cli.Run(); err != nil {

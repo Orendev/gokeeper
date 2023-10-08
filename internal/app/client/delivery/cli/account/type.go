@@ -1,16 +1,17 @@
 package account
 
 import (
-	"github.com/Orendev/gokeeper/internal/app/client/domain/account"
+	"time"
+
+	"github.com/Orendev/gokeeper/internal/pkg/domain/account"
+	"github.com/Orendev/gokeeper/pkg/tools/converter"
 	"github.com/Orendev/gokeeper/pkg/tools/encryption"
-	"github.com/Orendev/gokeeper/pkg/type/comment"
-	"github.com/Orendev/gokeeper/pkg/type/login"
-	"github.com/Orendev/gokeeper/pkg/type/password"
-	"github.com/pkg/errors"
+	"github.com/Orendev/gokeeper/pkg/type/title"
 )
 
 type CreateAccountArgs struct {
 	Title    string `json:"title"`
+	UserID   string `json:"user_id"`
 	Password string `json:"password"`
 	Login    string `json:"login"`
 	Comment  string `json:"comment"`
@@ -19,6 +20,7 @@ type CreateAccountArgs struct {
 
 type UpdateAccountArgs struct {
 	ID       string `json:"id"`
+	UserID   string `json:"user_id"`
 	Title    string `json:"title"`
 	Password string `json:"password"`
 	Login    string `json:"login"`
@@ -35,126 +37,116 @@ type ListAccountArgs struct {
 	Offset uint64 `json:"offset"`
 }
 
-type encryptable interface {
-	CreateAccountArgs | UpdateAccountArgs
+func ToEncCreateAccount(enc *encryption.Enc, args *CreateAccountArgs) (*account.Account, error) {
+	var err error
+
+	titleObj, err := title.New(args.Title)
+	if err != nil {
+		return nil, err
+	}
+
+	loginEnc, err := enc.EncryptByte([]byte(args.Login))
+	if err != nil {
+		return nil, err
+	}
+
+	passwordEnc, err := enc.EncryptByte([]byte(args.Password))
+	if err != nil {
+		return nil, err
+	}
+
+	urlEnc, err := enc.EncryptByte([]byte(args.URL))
+	if err != nil {
+		return nil, err
+	}
+
+	commentEnc, err := enc.EncryptByte([]byte(args.Comment))
+	if err != nil {
+		return nil, err
+	}
+
+	return account.New(
+		converter.StringToUUID(args.UserID),
+		*titleObj,
+		loginEnc,
+		passwordEnc,
+		urlEnc,
+		commentEnc,
+	)
 }
 
-func ToEncCreateAccountArgs(enc *encryption.Enc, args *CreateAccountArgs) error {
+func ToEncUpdateAccount(enc *encryption.Enc, args *UpdateAccountArgs) (*account.Account, error) {
 	var err error
-	loginEnc, err := enc.Encrypt(args.Login)
+
+	titleObj, err := title.New(args.Title)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	args.Login = loginEnc
 
-	passwordEnc, err := enc.Encrypt(args.Password)
+	loginEnc, err := enc.EncryptByte([]byte(args.Login))
 	if err != nil {
-		return err
+		return nil, err
 	}
-	args.Password = passwordEnc
 
-	commentEnc, err := enc.Encrypt(args.Comment)
+	passwordEnc, err := enc.EncryptByte([]byte(args.Password))
 	if err != nil {
-		return err
-	}
-	args.Comment = commentEnc
-
-	return err
-}
-
-func ToEncAccountArgs[T encryptable](enc *encryption.Enc, args *T) error {
-	var err error
-	switch v := interface{}(args).(type) {
-	case *UpdateAccountArgs:
-		loginEnc, err := enc.Encrypt(v.Login)
-		if err != nil {
-			return err
-		}
-		v.Login = loginEnc
-
-		passwordEnc, err := enc.Encrypt(v.Password)
-		if err != nil {
-			return err
-		}
-		v.Password = passwordEnc
-
-		commentEnc, err := enc.Encrypt(v.Comment)
-		if err != nil {
-			return err
-		}
-		v.Comment = commentEnc
-
-	case *CreateAccountArgs:
-		loginEnc, err := enc.Encrypt(v.Login)
-		if err != nil {
-			return err
-		}
-		v.Login = loginEnc
-
-		passwordEnc, err := enc.Encrypt(v.Password)
-		if err != nil {
-			return err
-		}
-		v.Password = passwordEnc
-
-		commentEnc, err := enc.Encrypt(v.Comment)
-		if err != nil {
-			return err
-		}
-		v.Comment = commentEnc
-	default:
-		return errors.Errorf("I don't know about type %T!\n", v)
+		return nil, err
 	}
 
-	return err
+	urlEnc, err := enc.EncryptByte([]byte(args.URL))
+	if err != nil {
+		return nil, err
+	}
+
+	commentEnc, err := enc.EncryptByte([]byte(args.Comment))
+	if err != nil {
+		return nil, err
+	}
+
+	return account.NewWithID(
+		converter.StringToUUID(args.ID),
+		converter.StringToUUID(args.UserID),
+		*titleObj,
+		loginEnc,
+		passwordEnc,
+		urlEnc,
+		commentEnc,
+		time.Now().UTC(),
+		time.Now().UTC(),
+	)
 }
 
 func ToDecAccount(enc *encryption.Enc, val *account.Account) (*account.Account, error) {
 
-	loginDec, err := enc.Decrypt(val.Login().String())
+	loginDec, err := enc.DecryptByte(val.Login())
 	if err != nil {
 		return nil, err
 	}
 
-	loginObj, err := login.New(loginDec)
+	passwordDec, err := enc.DecryptByte(val.Password())
 	if err != nil {
 		return nil, err
 	}
 
-	passwordDec, err := enc.Decrypt(val.Password().String())
+	urlDec, err := enc.DecryptByte(val.URL())
 	if err != nil {
 		return nil, err
 	}
 
-	passwordObj, err := password.New(passwordDec)
+	commentDec, err := enc.DecryptByte(val.Comment())
 	if err != nil {
 		return nil, err
 	}
 
-	commentDec, err := enc.Decrypt(val.Comment().String())
-	if err != nil {
-		return nil, err
-	}
-
-	commentObj, err := comment.New(commentDec)
-	if err != nil {
-		return nil, err
-	}
-
-	dAccount, err := account.NewWithID(
+	return account.NewWithID(
 		val.ID(),
+		val.UserID(),
 		val.Title(),
-		*loginObj,
-		*passwordObj,
-		val.URL(),
-		*commentObj,
-		val.IsDeleted(),
+		loginDec,
+		passwordDec,
+		urlDec,
+		commentDec,
 		val.CreatedAt(),
 		val.UpdatedAt(),
 	)
-	if err != nil {
-		return nil, err
-	}
-
-	return dAccount, nil
 }

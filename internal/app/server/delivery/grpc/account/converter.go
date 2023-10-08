@@ -3,9 +3,8 @@ package account
 import (
 	"time"
 
-	domainAccount "github.com/Orendev/gokeeper/internal/app/server/domain/account"
+	domainAccount "github.com/Orendev/gokeeper/internal/pkg/domain/account"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
-	"github.com/Orendev/gokeeper/pkg/type/queryParameter"
 	"github.com/google/uuid"
 )
 
@@ -27,25 +26,25 @@ func ToDeleteAccountResponse(id uuid.UUID) *protobuff.DeleteAccountResponse {
 	}
 }
 
-func ToListAccountResponse(accounts []*domainAccount.Account, parameter queryParameter.QueryParameter, total uint64) *protobuff.ListAccountResponse {
-	data := []*protobuff.AccountResponse{}
-	for _, value := range accounts {
-		data = append(data, &protobuff.AccountResponse{
+func ToListAccountResponse(list *domainAccount.ListAccountViewModel) *protobuff.ListAccountResponse {
+	data := []*protobuff.Account{}
+	for _, value := range list.Data {
+		data = append(data, &protobuff.Account{
 			ID:        value.ID().String(),
 			Title:     value.Title().String(),
-			Login:     value.Login().String(),
-			Password:  value.Password().String(),
-			URL:       value.URL().String(),
-			Comment:   value.Comment().String(),
+			Login:     value.Login(),
+			Password:  value.Password(),
+			URL:       value.URL(),
+			Comment:   value.Comment(),
 			CreatedAt: value.CreatedAt().Format(time.RFC3339),
 			UpdatedAt: value.UpdatedAt().Format(time.RFC3339),
 		})
 	}
 
 	return &protobuff.ListAccountResponse{
-		Total:  total,
-		Limit:  parameter.Pagination.Limit,
-		Offset: parameter.Pagination.Offset,
+		Total:  list.Total,
+		Limit:  list.Limit,
+		Offset: list.Offset,
 		Data:   data,
 	}
 }

@@ -3,7 +3,7 @@ package user
 import (
 	"time"
 
-	domainUser "github.com/Orendev/gokeeper/internal/app/server/domain/user"
+	domainUser "github.com/Orendev/gokeeper/internal/pkg/domain/user"
 	"github.com/Orendev/gokeeper/pkg/protobuff"
 )
 

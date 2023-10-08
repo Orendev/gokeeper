@@ -28,8 +28,15 @@ func (d *Delivery) CreateBinary(ctx context.Context, req *protobuff.CreateBinary
 		return nil, status.Errorf(codes.Internal, "binary data title validation error: %v", err)
 	}
 
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
+	createdAt, err := time.Parse(time.RFC3339, req.Data.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAt, err := time.Parse(time.RFC3339, req.Data.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
 
 	dBinary, err := domainBinary.NewWithID(
 		id,
@@ -66,8 +73,15 @@ func (d *Delivery) UpdateBinary(ctx context.Context, req *protobuff.UpdateBinary
 		return nil, status.Errorf(codes.Internal, "binary data comment validation error: %v", err)
 	}
 
-	createdAt := time.Now().UTC()
-	updatedAt := createdAt
+	createdAt, err := time.Parse(time.RFC3339, req.Data.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+
+	updatedAt, err := time.Parse(time.RFC3339, req.Data.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
 
 	dBinary, err := domainBinary.NewWithID(
 		id,
