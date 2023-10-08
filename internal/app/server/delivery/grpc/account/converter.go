@@ -38,6 +38,7 @@ func ToListAccountResponse(list *domainAccount.ListAccountViewModel) *protobuff.
 			Comment:   value.Comment(),
 			CreatedAt: value.CreatedAt().Format(time.RFC3339),
 			UpdatedAt: value.UpdatedAt().Format(time.RFC3339),
+			UserID:    value.UserID().String(),
 		})
 	}
 

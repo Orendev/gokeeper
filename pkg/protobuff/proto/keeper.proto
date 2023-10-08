@@ -75,6 +75,7 @@ message Account {
   bytes comment = 6;
   string createdAt = 7;
   string updatedAt = 8;
+  string userID = 9;
 }
 
 message CreateAccountRequest {
@@ -122,6 +123,7 @@ message Data {
   bytes comment = 4;
   string createdAt = 5;
   string updatedAt = 6;
+  string userID = 7;
 }
 
 message CreateTextRequest {
@@ -211,6 +213,7 @@ message Card {
   bytes comment = 6;
   string createdAt = 7;
   string updatedAt = 8;
+  string userID = 9;
 }
 
 message CreateCardRequest {

@@ -147,7 +147,7 @@ func (d *Delivery) listAccount() *cobra.Command {
 		Use:     "listAccount",
 		Aliases: []string{"listAc"},
 		Short:   "List account in the service.",
-		Long:    `This command list a account: Keeper client listAccount --limit=<10> --offset=<10>.`,
+		Long:    `This command list a account: Keeper client listAccount --limit=<10> --offset=<0>.`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			ctx := context.Background()
@@ -188,6 +188,14 @@ func (d *Delivery) listAccount() *cobra.Command {
 
 				fmt.Println(msg)
 			}
+
+			msg := fmt.Sprintf("Limit: %v\nOffset: %v\nTotal: %v\n",
+				list.Limit,
+				list.Offset,
+				list.Total,
+			)
+
+			fmt.Println(msg)
 
 		},
 	}

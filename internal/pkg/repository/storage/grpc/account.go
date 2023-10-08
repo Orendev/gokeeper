@@ -84,6 +84,9 @@ func (c *Client) ListAccount(ctx context.Context, parameter queryParameter.Query
 	}
 
 	res, err := c.KeeperServiceClient.ListAccount(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 
 	listData, err := dto.FromListAccountResponseToDto(res)
 	if err != nil {

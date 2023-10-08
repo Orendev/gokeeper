@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Orendev/gokeeper/internal/pkg/domain/account"
@@ -66,7 +65,7 @@ func ToDomainAccount(dto Account) (*account.Account, error) {
 
 	createdAt, err := time.Parse(time.RFC3339, dto.CreatedAt)
 	if err != nil {
-		fmt.Println("fff", dto)
+
 		return nil, err
 	}
 
