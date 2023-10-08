@@ -199,7 +199,7 @@ func (r *Repository) ListAccount(ctx context.Context, parameter queryParameter.Q
 		return nil, err
 	}
 
-	total, err := r.CountBinary(ctx, parameter)
+	total, err := r.CountAccount(ctx, parameter)
 	if err != nil {
 		return nil, err
 	}

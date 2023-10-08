@@ -107,9 +107,9 @@ func (c *Client) ListBinary(ctx context.Context, parameter queryParameter.QueryP
 	}
 
 	list.Data = data
-	res.Limit = res.GetLimit()
-	res.Offset = res.GetOffset()
-	res.Total = res.GetTotal()
+	list.Limit = res.GetLimit()
+	list.Offset = res.GetOffset()
+	list.Total = res.GetTotal()
 
 	return list, nil
 }

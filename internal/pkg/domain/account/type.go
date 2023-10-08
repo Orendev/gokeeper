@@ -1,7 +1,6 @@
 package account
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Orendev/gokeeper/pkg/type/title"
@@ -69,11 +68,11 @@ func New(
 ) (*Account, error) {
 
 	var timeNow = time.Now().UTC()
-	fmt.Println("dd", timeNow.UTC())
-	fmt.Println(timeNow.String())
+
 	return &Account{
 		id:        uuid.New(),
 		title:     title,
+		userID:    userID,
 		login:     login,
 		password:  password,
 		url:       url,
