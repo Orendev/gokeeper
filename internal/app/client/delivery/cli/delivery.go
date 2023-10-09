@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Orendev/gokeeper/internal/app/client/configs"
 	"github.com/Orendev/gokeeper/internal/pkg/repository"
@@ -56,7 +57,7 @@ func New(
 
 	rootCmd := &cobra.Command{
 		Use:     "keeper",
-		Version: configs.BuildVersion,
+		Version: fmt.Sprintf("%s\nbuild date %s", configs.BuildVersion, configs.BuildDate),
 		Short:   "Keeper - A simple CLI is a service for storing and protecting your important data",
 		Long:    `It can be used to store and protect your important data`,
 		Run: func(cmd *cobra.Command, args []string) {
