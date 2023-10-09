@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// CreateText creating a new text
 func (d *Delivery) CreateText(ctx context.Context, req *protobuff.CreateTextRequest) (*protobuff.CreateTextResponse, error) {
 	id := converter.StringToUUID(req.Data.GetID())
 
@@ -56,6 +57,7 @@ func (d *Delivery) CreateText(ctx context.Context, req *protobuff.CreateTextRequ
 	return converterText.ToCreateTextResponse(res), nil
 }
 
+// UpdateText updating the text
 func (d *Delivery) UpdateText(ctx context.Context, req *protobuff.UpdateTextRequest) (*protobuff.UpdateTextResponse, error) {
 	id := converter.StringToUUID(req.Data.GetID())
 
@@ -101,6 +103,7 @@ func (d *Delivery) UpdateText(ctx context.Context, req *protobuff.UpdateTextRequ
 	return converterText.ToUpdateTextResponse(res), nil
 }
 
+// DeleteText deleting text
 func (d *Delivery) DeleteText(ctx context.Context, req *protobuff.DeleteTextRequest) (*protobuff.DeleteTextResponse, error) {
 	id := converter.StringToUUID(req.GetID())
 
@@ -112,6 +115,7 @@ func (d *Delivery) DeleteText(ctx context.Context, req *protobuff.DeleteTextRequ
 	return converterText.ToDeleteTextResponse(id), nil
 }
 
+// ListText get the test list
 func (d *Delivery) ListText(ctx context.Context, req *protobuff.ListTextRequest) (*protobuff.ListTextResponse, error) {
 	var parameter queryParameter.QueryParameter
 	userID, err := d.jwtManager.GetAuthIdentifier(ctx)

@@ -13,6 +13,7 @@ import (
 	deliveryGrpc "github.com/Orendev/gokeeper/internal/app/server/delivery/grpc"
 )
 
+// Run  starts the application.
 func Run(delivery *deliveryGrpc.Delivery, cfg *configs.Config) {
 	var err error
 	var wg sync.WaitGroup
