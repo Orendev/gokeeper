@@ -35,7 +35,7 @@ var (
 	deleteResBin *protobuff.DeleteBinaryResponse
 
 	listReqBin *protobuff.ListBinaryRequest
-	listResBin *protobuff.ListBinaryResponse
+	//listResBin *protobuff.ListBinaryResponse
 )
 
 func testMainBinary() {
@@ -116,12 +116,12 @@ func testMainBinary() {
 	binListData := []*protobuff.Data{}
 
 	binListData = append(binListData, binUpdateData)
-	listResBin = &protobuff.ListBinaryResponse{
-		Limit:  parameter.Pagination.Limit,
-		Offset: parameter.Pagination.Offset,
-		Total:  totalBinary,
-		Data:   binListData,
-	}
+	//listResBin = &protobuff.ListBinaryResponse{
+	//	Limit:  parameter.Pagination.Limit,
+	//	Offset: parameter.Pagination.Offset,
+	//	Total:  totalBinary,
+	//	Data:   binListData,
+	//}
 }
 
 func initTestUseCaseBinary(t *testing.T) {
