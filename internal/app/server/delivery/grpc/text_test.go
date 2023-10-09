@@ -23,25 +23,26 @@ import (
 
 var (
 	storageRepository = new(mocks.Storage)
+	// text
 	texts             []*text.TextData
-	data              = make(map[uuid.UUID]*text.TextData)
+	dataText          = make(map[uuid.UUID]*text.TextData)
 	listTextViewModel = &text.ListTextViewModel{}
 	createText        *text.TextData
 	updateText        *text.TextData
 	parameter         = queryParameter.QueryParameter{}
-	total             uint64
+	totalText         uint64
 
-	createReq *protobuff.CreateTextRequest
-	createRes *protobuff.CreateTextResponse
+	createReqText *protobuff.CreateTextRequest
+	createResText *protobuff.CreateTextResponse
 
-	updateReq *protobuff.UpdateTextRequest
-	updateRes *protobuff.UpdateTextResponse
+	updateReqText *protobuff.UpdateTextRequest
+	updateResText *protobuff.UpdateTextResponse
 
-	deleteReq *protobuff.DeleteTextRequest
-	deleteRes *protobuff.DeleteTextResponse
+	deleteReqText *protobuff.DeleteTextRequest
+	deleteResText *protobuff.DeleteTextResponse
 
-	listReq *protobuff.ListTextRequest
-	listRes *protobuff.ListTextResponse
+	listReqText *protobuff.ListTextRequest
+	listResText *protobuff.ListTextResponse
 
 	ucUser     useCase.User
 	ucAccount  useCase.Account
@@ -54,6 +55,13 @@ var (
 
 func TestMain(m *testing.M) {
 
+	testMainText()
+	testMainBinary()
+
+	os.Exit(m.Run())
+}
+
+func testMainText() {
 	jwtManager = auth.NewJWTManager("", 120*time.Second)
 	userID := uuid.New()
 	accessToken, _ := jwtManager.Generate(userID)
@@ -81,9 +89,9 @@ func TestMain(m *testing.M) {
 		UpdatedAt: createText.UpdatedAt().Format(time.RFC3339),
 		UserID:    createText.UserID().String(),
 	}
-	createReq = &protobuff.CreateTextRequest{Data: txData}
+	createReqText = &protobuff.CreateTextRequest{Data: txData}
 
-	createRes = &protobuff.CreateTextResponse{
+	createResText = &protobuff.CreateTextResponse{
 		ID: createText.ID().String(),
 	}
 
@@ -109,40 +117,38 @@ func TestMain(m *testing.M) {
 		UserID:    updateText.UserID().String(),
 	}
 
-	updateReq = &protobuff.UpdateTextRequest{Data: txUpdateData}
+	updateReqText = &protobuff.UpdateTextRequest{Data: txUpdateData}
 
-	updateRes = &protobuff.UpdateTextResponse{
+	updateResText = &protobuff.UpdateTextResponse{
 		ID: updateText.ID().String(),
 	}
 
-	deleteReq = &protobuff.DeleteTextRequest{
+	deleteReqText = &protobuff.DeleteTextRequest{
 		ID: updateText.ID().String(),
 	}
-	deleteRes = &protobuff.DeleteTextResponse{
+	deleteResText = &protobuff.DeleteTextResponse{
 		ID: updateText.ID().String(),
 	}
 
-	listReq = &protobuff.ListTextRequest{
+	listReqText = &protobuff.ListTextRequest{
 		Limit:  parameter.Pagination.Limit,
 		Offset: parameter.Pagination.Offset,
 	}
 
-	total = 1
+	totalText = 1
 
 	txListData := []*protobuff.Data{}
 
 	txListData = append(txListData, txUpdateData)
-	listRes = &protobuff.ListTextResponse{
+	listResText = &protobuff.ListTextResponse{
 		Limit:  parameter.Pagination.Limit,
 		Offset: parameter.Pagination.Offset,
-		Total:  total,
+		Total:  totalText,
 		Data:   txListData,
 	}
-
-	os.Exit(m.Run())
 }
 
-func initTestUseCaseTest(t *testing.T) {
+func initTestUseCaseText(t *testing.T) {
 	assertion := assert.New(t)
 	storageRepository.On("CreateText",
 		mock.Anything,
@@ -151,7 +157,7 @@ func initTestUseCaseTest(t *testing.T) {
 			assertion.Equal(text.ID(), updateText.ID())
 			texts = append(texts, text)
 			listTextViewModel.Data = texts
-			data[text.ID()] = text
+			dataText[text.ID()] = text
 
 			return text
 		}, func(ctx context.Context, text *text.TextData) error {
@@ -169,7 +175,7 @@ func initTestUseCaseTest(t *testing.T) {
 				texts = append(texts, text)
 			}
 
-			data[text.ID()] = text
+			dataText[text.ID()] = text
 			listTextViewModel.Data = texts
 
 			return text
@@ -181,7 +187,7 @@ func initTestUseCaseTest(t *testing.T) {
 		mock.Anything,
 		mock.AnythingOfType("uuid.UUID")).
 		Return(func(ctx context.Context, id uuid.UUID) error {
-			if _, ok := data[id]; !ok {
+			if _, ok := dataText[id]; !ok {
 				return repository.ErrDataNotFound
 			}
 			return nil
@@ -206,40 +212,40 @@ func initTestUseCaseTest(t *testing.T) {
 }
 
 func TestDeliveryText(t *testing.T) {
-	initTestUseCaseTest(t)
+	initTestUseCaseText(t)
 	ucText = useCaseText.New(storageRepository, useCaseText.Options{})
 	option := Options{}
 	deliveryGRPC := New(ucUser, ucAccount, ucCard, ucText, ucBinary, jwtManager, option)
 	assertion := assert.New(t)
 
 	t.Run("positive create text", func(t *testing.T) {
-		result, err := deliveryGRPC.CreateText(ctx, createReq)
+		result, err := deliveryGRPC.CreateText(ctx, createReqText)
 		assertion.NoError(err)
-		assertion.Equal(result, createRes)
+		assertion.Equal(result, createResText)
 	})
 
 	t.Run("negative create text", func(t *testing.T) {
-		result, err := deliveryGRPC.CreateText(context.Background(), createReq)
+		result, err := deliveryGRPC.CreateText(context.Background(), createReqText)
 		assertion.Errorf(err, auth.ErrorTokenContextMissing.Error())
 		assertion.Nil(result)
 	})
 
 	t.Run("positive update text", func(t *testing.T) {
-		result, err := deliveryGRPC.UpdateText(ctx, updateReq)
+		result, err := deliveryGRPC.UpdateText(ctx, updateReqText)
 		assertion.NoError(err)
-		assertion.Equal(result, updateRes)
+		assertion.Equal(result, updateResText)
 	})
 
 	t.Run("negative update text", func(t *testing.T) {
-		result, err := deliveryGRPC.UpdateText(context.Background(), updateReq)
+		result, err := deliveryGRPC.UpdateText(context.Background(), updateReqText)
 		assertion.Errorf(err, auth.ErrorTokenContextMissing.Error())
 		assertion.Nil(result)
 	})
 
 	t.Run("positive delete text", func(t *testing.T) {
-		result, err := deliveryGRPC.DeleteText(ctx, deleteReq)
+		result, err := deliveryGRPC.DeleteText(ctx, deleteReqText)
 		assertion.NoError(err)
-		assertion.Equal(result, deleteRes)
+		assertion.Equal(result, deleteResText)
 	})
 
 	t.Run("negative delete text", func(t *testing.T) {
@@ -249,15 +255,15 @@ func TestDeliveryText(t *testing.T) {
 	})
 
 	t.Run("positive list text", func(t *testing.T) {
-		total = uint64(len(listTextViewModel.Data))
-		result, err := deliveryGRPC.ListText(ctx, listReq)
+		totalText = uint64(len(listTextViewModel.Data))
+		result, err := deliveryGRPC.ListText(ctx, listReqText)
 		assertion.NoError(err)
-		assertion.Equal(result.Data[0], listRes.Data[0])
-		assertion.Equal(result.Total, total)
+		assertion.Equal(result.Data[0], listResText.Data[0])
+		assertion.Equal(result.Total, totalText)
 	})
 
 	t.Run("negative list text", func(t *testing.T) {
-		result, err := deliveryGRPC.ListText(context.Background(), listReq)
+		result, err := deliveryGRPC.ListText(context.Background(), listReqText)
 		assertion.Errorf(err, auth.ErrorTokenContextMissing.Error())
 		assertion.Nil(result)
 	})

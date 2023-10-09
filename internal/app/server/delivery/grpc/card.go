@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// CreateCard creating a new card
 func (d *Delivery) CreateCard(ctx context.Context, req *protobuff.CreateCardRequest) (*protobuff.CreateCardResponse, error) {
 	id := converter.StringToUUID(req.Data.GetID())
 
@@ -52,6 +53,7 @@ func (d *Delivery) CreateCard(ctx context.Context, req *protobuff.CreateCardRequ
 	return converterCard.ToCreateCardResponse(res), nil
 }
 
+// UpdateCard updating the card
 func (d *Delivery) UpdateCard(ctx context.Context, req *protobuff.UpdateCardRequest) (*protobuff.UpdateCardResponse, error) {
 	id := converter.StringToUUID(req.Data.GetID())
 
@@ -90,6 +92,7 @@ func (d *Delivery) UpdateCard(ctx context.Context, req *protobuff.UpdateCardRequ
 	return converterCard.ToUpdateCardResponse(res), nil
 }
 
+// DeleteCard deleting card
 func (d *Delivery) DeleteCard(ctx context.Context, req *protobuff.DeleteCardRequest) (*protobuff.DeleteCardResponse, error) {
 	id := converter.StringToUUID(req.GetID())
 
@@ -101,6 +104,7 @@ func (d *Delivery) DeleteCard(ctx context.Context, req *protobuff.DeleteCardRequ
 	return converterCard.ToDeleteCardResponse(id), nil
 }
 
+// ListCard get the test card
 func (d *Delivery) ListCard(ctx context.Context, req *protobuff.ListCardRequest) (*protobuff.ListCardResponse, error) {
 	var parameter queryParameter.QueryParameter
 	userID, err := d.jwtManager.GetAuthIdentifier(ctx)

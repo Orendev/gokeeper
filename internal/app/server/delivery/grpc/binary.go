@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// CreateBinary creating a new binary
 func (d *Delivery) CreateBinary(ctx context.Context, req *protobuff.CreateBinaryRequest) (*protobuff.CreateBinaryResponse, error) {
 	id := converter.StringToUUID(req.Data.GetID())
 
@@ -56,6 +57,7 @@ func (d *Delivery) CreateBinary(ctx context.Context, req *protobuff.CreateBinary
 	return converterBinary.ToCreateBinaryResponse(res), nil
 }
 
+// UpdateBinary updating the binary
 func (d *Delivery) UpdateBinary(ctx context.Context, req *protobuff.UpdateBinaryRequest) (*protobuff.UpdateBinaryResponse, error) {
 	id := converter.StringToUUID(req.Data.GetID())
 
@@ -101,6 +103,7 @@ func (d *Delivery) UpdateBinary(ctx context.Context, req *protobuff.UpdateBinary
 	return converterBinary.ToUpdateBinaryResponse(res), nil
 }
 
+// DeleteBinary deleting binary
 func (d *Delivery) DeleteBinary(ctx context.Context, req *protobuff.DeleteBinaryRequest) (*protobuff.DeleteBinaryResponse, error) {
 	id := converter.StringToUUID(req.GetID())
 
@@ -112,6 +115,7 @@ func (d *Delivery) DeleteBinary(ctx context.Context, req *protobuff.DeleteBinary
 	return converterBinary.ToDeleteBinaryResponse(id), nil
 }
 
+// ListBinary get the binary list
 func (d *Delivery) ListBinary(ctx context.Context, req *protobuff.ListBinaryRequest) (*protobuff.ListBinaryResponse, error) {
 	var parameter queryParameter.QueryParameter
 	userID, err := d.jwtManager.GetAuthIdentifier(ctx)

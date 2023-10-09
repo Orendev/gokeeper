@@ -11,11 +11,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Options GRPC server configurations
 type Options struct {
 	Host string `env:"GRPC_HOST" env-default:"localhost"`
 	Port uint   `env:"GRPC_PORT" env-default:"3200"`
 }
 
+// Delivery a structure describing an input point for external applications
 type Delivery struct {
 	protobuff.UnimplementedKeeperServiceServer
 	ucUser    useCase.User
@@ -29,6 +31,7 @@ type Delivery struct {
 	options    Options
 }
 
+// New initializing constructor Delivery
 func New(
 	ucUser useCase.User,
 	ucAccount useCase.Account,
@@ -74,6 +77,7 @@ func (d *Delivery) SetOptions(options Options) {
 	}
 }
 
+// Run start server.
 func (d *Delivery) Run() error {
 	listen, err := net.Listen("tcp", fmt.Sprintf("%s:%d", d.options.Host, d.options.Port))
 	if err != nil {

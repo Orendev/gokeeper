@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// CreateAccount creating a new account
 func (d *Delivery) CreateAccount(ctx context.Context, req *protobuff.CreateAccountRequest) (*protobuff.CreateAccountResponse, error) {
 	id := converter.StringToUUID(req.Data.GetID())
 
@@ -58,6 +59,7 @@ func (d *Delivery) CreateAccount(ctx context.Context, req *protobuff.CreateAccou
 	return converterAccount.ToCreateAccountResponse(res), nil
 }
 
+// UpdateAccount updating the account
 func (d *Delivery) UpdateAccount(ctx context.Context, req *protobuff.UpdateAccountRequest) (*protobuff.UpdateAccountResponse, error) {
 	id := converter.StringToUUID(req.Data.GetID())
 
@@ -101,6 +103,7 @@ func (d *Delivery) UpdateAccount(ctx context.Context, req *protobuff.UpdateAccou
 	return converterAccount.ToUpdateAccountResponse(res), nil
 }
 
+// DeleteAccount deleting account
 func (d *Delivery) DeleteAccount(ctx context.Context, req *protobuff.DeleteAccountRequest) (*protobuff.DeleteAccountResponse, error) {
 	id := converter.StringToUUID(req.GetID())
 
@@ -112,6 +115,7 @@ func (d *Delivery) DeleteAccount(ctx context.Context, req *protobuff.DeleteAccou
 	return converterAccount.ToDeleteAccountResponse(id), nil
 }
 
+// ListAccount get the test list
 func (d *Delivery) ListAccount(ctx context.Context, req *protobuff.ListAccountRequest) (*protobuff.ListAccountResponse, error) {
 	var parameter queryParameter.QueryParameter
 	userID, err := d.jwtManager.GetAuthIdentifier(ctx)
