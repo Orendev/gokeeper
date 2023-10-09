@@ -9,6 +9,7 @@ import (
 	"github.com/Orendev/gokeeper/pkg/type/title"
 )
 
+// CreateAccountArgs data structure for creating an account
 type CreateAccountArgs struct {
 	Title    string `json:"title"`
 	UserID   string `json:"user_id"`
@@ -18,6 +19,7 @@ type CreateAccountArgs struct {
 	URL      string `json:"url"`
 }
 
+// UpdateAccountArgs data structure for update an account
 type UpdateAccountArgs struct {
 	ID       string `json:"id"`
 	UserID   string `json:"user_id"`
@@ -28,15 +30,18 @@ type UpdateAccountArgs struct {
 	URL      string `json:"url"`
 }
 
+// DeleteAccountArgs data structure for delete an account
 type DeleteAccountArgs struct {
 	ID string `json:"id"`
 }
 
+// ListAccountArgs data structure for getting a list of accounts
 type ListAccountArgs struct {
 	Limit  uint64 `json:"limit"`
 	Offset uint64 `json:"offset"`
 }
 
+// ToEncCreateAccount data encoding account creation
 func ToEncCreateAccount(enc *encryption.Enc, args *CreateAccountArgs) (*account.Account, error) {
 	var err error
 
@@ -75,6 +80,7 @@ func ToEncCreateAccount(enc *encryption.Enc, args *CreateAccountArgs) (*account.
 	)
 }
 
+// ToEncUpdateAccount data encoding account update
 func ToEncUpdateAccount(enc *encryption.Enc, args *UpdateAccountArgs) (*account.Account, error) {
 	var err error
 
@@ -116,6 +122,7 @@ func ToEncUpdateAccount(enc *encryption.Enc, args *UpdateAccountArgs) (*account.
 	)
 }
 
+// ToDecAccount decoding account data
 func ToDecAccount(enc *encryption.Enc, val *account.Account) (*account.Account, error) {
 
 	loginDec, err := enc.DecryptByte(val.Login())
