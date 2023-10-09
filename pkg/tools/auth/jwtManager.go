@@ -47,10 +47,12 @@ type JWTManager struct {
 	tokenDuration time.Duration
 }
 
+// NewJWTManager initialization constructor for the jwt token manager
 func NewJWTManager(secretKey string, tokenDuration time.Duration) *JWTManager {
 	return &JWTManager{secretKey, tokenDuration}
 }
 
+// Generate generating a jwt authorization token
 func (manager *JWTManager) Generate(userID uuid.UUID) (string, error) {
 	claims := Claims{
 		StandardClaims: jwt.StandardClaims{
@@ -64,6 +66,7 @@ func (manager *JWTManager) Generate(userID uuid.UUID) (string, error) {
 	return token.SignedString([]byte(manager.secretKey))
 }
 
+// Verify verification of the authorization token
 func (manager *JWTManager) Verify(accessToken string) (*Claims, error) {
 	token, err := jwt.ParseWithClaims(
 		accessToken,
