@@ -60,6 +60,7 @@ func TestMain(m *testing.M) {
 	testMainBinary()
 	testMainCard()
 	testMainAccount()
+	testMainUser()
 
 	os.Exit(m.Run())
 }

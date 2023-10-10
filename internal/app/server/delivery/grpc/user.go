@@ -76,7 +76,6 @@ func (d *Delivery) RegisterUser(ctx context.Context, req *protobuff.RegisterUser
 	)
 
 	if err != nil {
-		logger.Log.Error("error create user", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user initialization error: %v", err)
 	}
 
@@ -91,7 +90,6 @@ func (d *Delivery) RegisterUser(ctx context.Context, req *protobuff.RegisterUser
 
 	response, err := d.ucUser.Create(context.Background(), dUser)
 	if err != nil {
-		logger.Log.Error("error login", zap.Error(err))
 		return nil, status.Errorf(codes.Internal, "user creation error: %v", err)
 	}
 
