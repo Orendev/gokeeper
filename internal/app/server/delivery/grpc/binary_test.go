@@ -35,15 +35,10 @@ var (
 	deleteResBin *protobuff.DeleteBinaryResponse
 
 	listReqBin *protobuff.ListBinaryRequest
-	//listResBin *protobuff.ListBinaryResponse
+	listResBin *protobuff.ListBinaryResponse
 )
 
 func testMainBinary() {
-	userID := uuid.New()
-	//accessToken, _ := jwtManager.Generate(userID)
-	//header := metadata.New(map[string]string{auth.AuthorizationKey: accessToken})
-	//ctx = metadata.NewIncomingContext(context.Background(), header)
-
 	titleObj, _ := title.New("Test title")
 
 	createBinary, _ = binary.New(
@@ -116,12 +111,12 @@ func testMainBinary() {
 	binListData := []*protobuff.Data{}
 
 	binListData = append(binListData, binUpdateData)
-	//listResBin = &protobuff.ListBinaryResponse{
-	//	Limit:  parameter.Pagination.Limit,
-	//	Offset: parameter.Pagination.Offset,
-	//	Total:  totalBinary,
-	//	Data:   binListData,
-	//}
+	listResBin = &protobuff.ListBinaryResponse{
+		Limit:  parameter.Pagination.Limit,
+		Offset: parameter.Pagination.Offset,
+		Total:  totalBinary,
+		Data:   binListData,
+	}
 }
 
 func initTestUseCaseBinary(t *testing.T) {
@@ -234,6 +229,7 @@ func TestDeliveryBinary(t *testing.T) {
 		totalBinary = uint64(len(listBinaryViewModel.Data))
 		result, err := deliveryGRPC.ListBinary(ctx, listReqBin)
 		assertion.NoError(err)
+		assertion.Equal(result.Data[0], listResBin.Data[0])
 		assertion.Equal(result.Total, totalBinary)
 	})
 

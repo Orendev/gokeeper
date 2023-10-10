@@ -51,19 +51,21 @@ var (
 	ucBinary   useCase.Binary
 	jwtManager *auth.JWTManager
 	ctx        context.Context
+	userID     uuid.UUID
 )
 
 func TestMain(m *testing.M) {
 
 	testMainText()
 	testMainBinary()
+	testMainCard()
 
 	os.Exit(m.Run())
 }
 
 func testMainText() {
 	jwtManager = auth.NewJWTManager("", 120*time.Second)
-	userID := uuid.New()
+	userID = uuid.New()
 	accessToken, _ := jwtManager.Generate(userID)
 	header := metadata.New(map[string]string{auth.AuthorizationKey: accessToken})
 	ctx = metadata.NewIncomingContext(context.Background(), header)
