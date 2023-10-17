@@ -1,0 +1,13 @@
+quiet: False
+disable-version-string: True
+with-expecter: true
+mockname: "{{.InterfaceName}}"
+filename: "mock_{{.MockName}}.go"
+outpkg: mocks
+packages:
+  github.com/Orendev/gokeeper/internal/pkg/useCase/adapters:
+      interfaces:
+        Storage:
+          config:
+            dir: internal/pkg/repository/storage/mocks
+            all: True
